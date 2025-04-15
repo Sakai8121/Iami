@@ -5,7 +5,7 @@ using VContainer;
 
 public class PlayerBodyStateHolder
 {
-    private readonly ReactiveProperty<PlayerBodyState> _currentPlayerState = new(PlayerBodyState.None);
+    readonly ReactiveProperty<PlayerBodyState> _currentPlayerState = new(PlayerBodyState.None);
     public IReadOnlyReactiveProperty<PlayerBodyState> CurrentPlayerState => _currentPlayerState;
 
     [Inject]
@@ -21,11 +21,32 @@ public class PlayerBodyStateHolder
     {
         var current = _currentPlayerState.Value;
 
+        //ストレッチモードになるならコントラクトモードはやめる
         if (playState == PlayerBodyState.Stretching)
             current &= ~PlayerBodyState.Contracted;
 
+        //コントラクトモードになるならストレッチモードはやめる
         if (playState == PlayerBodyState.Contracted)
             current &= ~PlayerBodyState.Stretching;
+        
+        //左回転しようとしたとき回転キャンセル中なら回転の入力を受け付けない
+        if(playState == PlayerBodyState.RotatingLeft && IsContainState(PlayerBodyState.CancelRotate))
+            return;
+        //右回転しようとしたとき回転キャンセル中なら回転の入力を受け付けない
+        if(playState == PlayerBodyState.RotatingRight && IsContainState(PlayerBodyState.CancelRotate))
+            return;
+        //左回転しようとしたとき右回転中ならキャンセル回転する(回転前の位置にもどる処理)
+        if (playState == PlayerBodyState.RotatingLeft && IsContainState(PlayerBodyState.RotatingRight))
+        {
+            current &= ~PlayerBodyState.RotatingRight;
+            playState = PlayerBodyState.CancelRotate;
+        }
+        //右回転しようとしたとき左回転中ならキャンセル回転する(回転前の位置にもどる処理)
+        if (playState == PlayerBodyState.RotatingRight && IsContainState(PlayerBodyState.RotatingLeft))
+        {
+            current &= ~PlayerBodyState.RotatingLeft;
+            playState = PlayerBodyState.CancelRotate;
+        }
 
         current |= playState;
         _currentPlayerState.Value = current;
@@ -36,7 +57,7 @@ public class PlayerBodyStateHolder
         _currentPlayerState.Value &= ~playState;
     }
 
-    public bool IsContainState(PlayerBodyState playState)
+    bool IsContainState(PlayerBodyState playState)
     {
         return (_currentPlayerState.Value & playState) != 0;
     }
@@ -51,4 +72,5 @@ public enum PlayerBodyState
     Contracted = 1 << 1, // 0010
     RotatingLeft = 1 << 2,
     RotatingRight = 1 << 3,
+    CancelRotate = 1 << 4,
 }

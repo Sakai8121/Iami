@@ -39,8 +39,22 @@ public class PlayerBodyStateObserver : IInitializable, IDisposable
                 // Rotating Right ‚Ìˆ—
                 bodyPhysicsDataCalculator.StartRotateRight();
             }},
+            { PlayerBodyState.CancelRotate, () => {
+                Debug.Log("Player is Rotating Right");
+                // Rotating Right ‚Ìˆ—
+                bodyPhysicsDataCalculator.CancelRotate();
+            }},
             // •K—v‚É‰ž‚¶‚Ä’Ç‰Á
         };
+
+        bodyPhysicsDataCalculator.EndContractAction +=
+            () => stateHolder.RemovePlayerBodyState(PlayerBodyState.Contracted);
+        bodyPhysicsDataCalculator.EndRotateRightAction +=
+            () => stateHolder.RemovePlayerBodyState(PlayerBodyState.RotatingRight);
+        bodyPhysicsDataCalculator.EndRotateLeftAction +=
+            () => stateHolder.RemovePlayerBodyState(PlayerBodyState.RotatingLeft);
+        bodyPhysicsDataCalculator.EndCancelRotateAction +=
+            () => stateHolder.RemovePlayerBodyState(PlayerBodyState.CancelRotate);
     }
 
     public void Initialize()

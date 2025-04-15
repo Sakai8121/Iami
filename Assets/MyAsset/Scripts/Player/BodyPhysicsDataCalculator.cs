@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using VContainer;
 using Cysharp.Threading.Tasks;
@@ -7,6 +8,12 @@ public class BodyPhysicsDataCalculator
 {
     public ObservableProperty<Vector2> BodyScale { get; private set; }
     public ObservableProperty<Quaternion> BodyRotation { get; private set; }
+
+    public event Action EndStretchAction = () => { };
+    public event Action EndContractAction = () => { };
+    public event Action EndRotateRightAction = () => { };
+    public event Action EndRotateLeftAction = () => { };
+    public event Action EndCancelRotateAction = () => { };
 
     const float maxBodySize = 5.0f;
     const float minBodySize = 1.0f;
@@ -26,7 +33,7 @@ public class BodyPhysicsDataCalculator
     CancellationTokenSource _cancelRotateCts;
 
     Quaternion _preRotation;
-    bool _isCancelling;
+    RotateState _currentRotateState;
 
     [Inject]
     public BodyPhysicsDataCalculator()
@@ -35,7 +42,7 @@ public class BodyPhysicsDataCalculator
         BodyRotation = new ObservableProperty<Quaternion>(Quaternion.identity);
 
         _preRotation = Quaternion.identity;
-        _isCancelling = false;
+        _currentRotateState = RotateState.None;
     }
 
     public void StartStretch()
@@ -56,22 +63,28 @@ public class BodyPhysicsDataCalculator
 
     public void StartRotateRight()
     {
-        _rotateCts?.Cancel();
-        _cancelRotateCts?.Cancel();
-        _rotateCts = new CancellationTokenSource();
-        RotateAsync(rotateValue, _rotateCts.Token).Forget();
-    }
-
-    public void StartRotateLeft()
-    {
+        _currentRotateState = RotateState.Right;
+        
         _rotateCts?.Cancel();
         _cancelRotateCts?.Cancel();
         _rotateCts = new CancellationTokenSource();
         RotateAsync(-rotateValue, _rotateCts.Token).Forget();
     }
 
+    public void StartRotateLeft()
+    {
+        _currentRotateState = RotateState.Left;
+        
+        _rotateCts?.Cancel();
+        _cancelRotateCts?.Cancel();
+        _rotateCts = new CancellationTokenSource();
+        RotateAsync(rotateValue, _rotateCts.Token).Forget();
+    }
+
     public void CancelRotate()
     {
+        _currentRotateState = RotateState.Cancel;
+        
         _rotateCts?.Cancel();
         _cancelRotateCts?.Cancel();
         _cancelRotateCts = new CancellationTokenSource();
@@ -87,6 +100,7 @@ public class BodyPhysicsDataCalculator
             await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
         BodyScale.Value = new Vector2(bodyXSize, maxBodySize);
+        EndStretchAction();
     }
 
     async UniTaskVoid ContractAsync(CancellationToken token)
@@ -98,6 +112,7 @@ public class BodyPhysicsDataCalculator
             await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
         BodyScale.Value = new Vector2(bodyXSize, minBodySize);
+        EndContractAction();
     }
 
     async UniTaskVoid RotateAsync(float angle, CancellationToken token)
@@ -106,7 +121,10 @@ public class BodyPhysicsDataCalculator
         while (Mathf.Abs(rotated) < Mathf.Abs(angle))
         {
             token.ThrowIfCancellationRequested();
+
             float delta = rotateSpeed * Time.deltaTime;
+            delta = Mathf.Sign(angle) * delta; // ← 符号を調整
+
             if (Mathf.Abs(rotated + delta) > Mathf.Abs(angle))
                 delta = angle - rotated;
 
@@ -116,15 +134,18 @@ public class BodyPhysicsDataCalculator
         }
 
         _preRotation = BodyRotation.Value;
+        if (_currentRotateState == RotateState.Right)
+            EndRotateRightAction();
+        else if (_currentRotateState == RotateState.Left)
+            EndRotateLeftAction();
     }
+
 
     async UniTaskVoid CancelRotateAsync(CancellationToken token)
     {
-        _isCancelling = true;
-
         Quaternion targetRotation = _preRotation;
 
-        while (Quaternion.Angle(BodyRotation.Value, targetRotation) > 0.01f)
+        while (Quaternion.Angle(BodyRotation.Value, targetRotation) > cancelRotationSpeed * Time.deltaTime)
         {
             token.ThrowIfCancellationRequested();
 
@@ -133,14 +154,21 @@ public class BodyPhysicsDataCalculator
                 targetRotation,
                 cancelRotationSpeed * Time.deltaTime
             );
-
             await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
 
         // 誤差が残らないように最終的にピッタリ合わせる
         BodyRotation.Value = targetRotation;
         _preRotation = targetRotation;
-        _isCancelling = false;
+        EndCancelRotateAction();
     }
 
+}
+
+enum RotateState
+{
+    None,
+    Right,
+    Left,
+    Cancel
 }
