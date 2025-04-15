@@ -17,7 +17,7 @@ public class PlayerBodyStateHolder
         playerInputController.RotateRightAction += () => AddPlayerBodyState(PlayerBodyState.RotatingRight);
     }
 
-    public void AddPlayerBodyState(PlayerBodyState playState)
+    void AddPlayerBodyState(PlayerBodyState playState)
     {
         var current = _currentPlayerState.Value;
 

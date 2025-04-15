@@ -5,31 +5,37 @@ using System.Threading;
 
 public class BodyPhysicsDataCalculator
 {
-    // �O������擾�p
     public ObservableProperty<Vector2> BodyScale { get; private set; }
     public ObservableProperty<Quaternion> BodyRotation { get; private set; }
-
-    Vector2 _bodyScale;
-    Quaternion _bodyRotation;
 
     const float maxBodySize = 5.0f;
     const float minBodySize = 1.0f;
     const float rotateValue = 90;
 
-    const float stretchSpeed = 0.05f;
-    const float contractSpeed = 0.1f;
-    const float rotateSpeed = 1.0f;
+    const float stretchSpeed = 1.5f;
+    const float contractSpeed = 3f;
+    const float rotateSpeed = 120.0f;
     
+    const float cancelRotationSpeed = 360f; // 1秒で360度回転する速度
+
+    const float bodyXSize = 0.35f;
+
     CancellationTokenSource _stretchCts;
     CancellationTokenSource _contractCts;
     CancellationTokenSource _rotateCts;
     CancellationTokenSource _cancelRotateCts;
 
+    Quaternion _preRotation;
+    bool _isCancelling;
+
     [Inject]
     public BodyPhysicsDataCalculator()
     {
-        _bodyScale = new Vector2(1, minBodySize);
-        _bodyRotation = Quaternion.identity;
+        BodyScale = new ObservableProperty<Vector2>(new Vector2(bodyXSize, minBodySize));
+        BodyRotation = new ObservableProperty<Quaternion>(Quaternion.identity);
+
+        _preRotation = Quaternion.identity;
+        _isCancelling = false;
     }
 
     public void StartStretch()
@@ -64,7 +70,7 @@ public class BodyPhysicsDataCalculator
         RotateAsync(-rotateValue, _rotateCts.Token).Forget();
     }
 
-    public void CancellRotate()
+    public void CancelRotate()
     {
         _rotateCts?.Cancel();
         _cancelRotateCts?.Cancel();
@@ -74,24 +80,24 @@ public class BodyPhysicsDataCalculator
 
     async UniTaskVoid StretchAsync(CancellationToken token)
     {
-        while (_bodyScale.y < maxBodySize)
+        while (BodyScale.Value.y < maxBodySize)
         {
             token.ThrowIfCancellationRequested();
-            _bodyScale.y += stretchSpeed;
+            BodyScale.Value = new Vector2(bodyXSize, BodyScale.Value.y + stretchSpeed * Time.deltaTime);
             await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
-        _bodyScale.y = maxBodySize;
+        BodyScale.Value = new Vector2(bodyXSize, maxBodySize);
     }
 
     async UniTaskVoid ContractAsync(CancellationToken token)
     {
-        while (_bodyScale.y > minBodySize)
+        while (BodyScale.Value.y > minBodySize)
         {
             token.ThrowIfCancellationRequested();
-            _bodyScale.y -= contractSpeed;
+            BodyScale.Value = new Vector2(bodyXSize, BodyScale.Value.y - contractSpeed * Time.deltaTime);
             await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
-        _bodyScale.y = minBodySize;
+        BodyScale.Value = new Vector2(bodyXSize, minBodySize);
     }
 
     async UniTaskVoid RotateAsync(float angle, CancellationToken token)
@@ -100,32 +106,41 @@ public class BodyPhysicsDataCalculator
         while (Mathf.Abs(rotated) < Mathf.Abs(angle))
         {
             token.ThrowIfCancellationRequested();
-            float delta = rotateSpeed;
+            float delta = rotateSpeed * Time.deltaTime;
             if (Mathf.Abs(rotated + delta) > Mathf.Abs(angle))
                 delta = angle - rotated;
 
             rotated += delta;
-            _bodyRotation *= Quaternion.Euler(0, 0, delta);
+            BodyRotation.Value *= Quaternion.Euler(0, 0, delta);
             await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
+
+        _preRotation = BodyRotation.Value;
     }
 
     async UniTaskVoid CancelRotateAsync(CancellationToken token)
     {
-        Quaternion startRotation = _bodyRotation;
-        Quaternion targetRotation = Quaternion.identity;
+        _isCancelling = true;
 
-        float t = 0f;
-        const float duration = 0.5f; // adjust as needed
+        Quaternion targetRotation = _preRotation;
 
-        while (t < 1f)
+        while (Quaternion.Angle(BodyRotation.Value, targetRotation) > 0.01f)
         {
             token.ThrowIfCancellationRequested();
-            t += Time.deltaTime / duration;
-            _bodyRotation = Quaternion.Lerp(startRotation, targetRotation, t);
+
+            BodyRotation.Value = Quaternion.RotateTowards(
+                BodyRotation.Value,
+                targetRotation,
+                cancelRotationSpeed * Time.deltaTime
+            );
+
             await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
 
-        _bodyRotation = targetRotation;
+        // 誤差が残らないように最終的にピッタリ合わせる
+        BodyRotation.Value = targetRotation;
+        _preRotation = targetRotation;
+        _isCancelling = false;
     }
+
 }

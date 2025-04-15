@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 using VContainer.Unity;
 
-public class PlayerInputController:ITickable
+public class PlayerInputController : ITickable
 {
     public event Action StartStretchAction = () => { };
     public event Action EndStretchAction = () => { };

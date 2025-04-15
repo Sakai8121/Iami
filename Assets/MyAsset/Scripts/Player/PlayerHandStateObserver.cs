@@ -4,18 +4,18 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class PlayerHandStateObsever : IInitializable, IDisposable
+public class PlayerHandStateObserver : IInitializable, IDisposable
 {
-    private readonly PlayerHandStateHolder _stateHolder;
-    private readonly CompositeDisposable _disposables = new();
+    readonly PlayerHandStateHolder _stateHolder;
+    readonly CompositeDisposable _disposables = new();
 
     [Inject]
-    public PlayerHandStateObsever(PlayerHandStateHolder stateHolder)
+    public PlayerHandStateObserver(PlayerHandStateHolder stateHolder)
     {
         _stateHolder = stateHolder;
 
         _stateHolder.CurrentPlayerState
-            .Skip(1) // ‰Šú’l‚ğ–³‹‚·‚éê‡
+            .Skip(1) // åˆæœŸå€¤ã‚’ç„¡è¦–ã™ã‚‹å ´åˆ
             .Subscribe(OnStateChanged)
             .AddTo(_disposables);
     }
@@ -23,7 +23,7 @@ public class PlayerHandStateObsever : IInitializable, IDisposable
     public void Initialize()
     {
         _stateHolder.CurrentPlayerState
-                .Skip(1) // ‰Šú’l‚ğ–³‹‚·‚éê‡
+                .Skip(1) // åˆæœŸå€¤ã‚’ç„¡è¦–ã™ã‚‹å ´åˆ
                 .Subscribe(OnStateChanged)
                 .AddTo(_disposables);
     }
@@ -33,16 +33,16 @@ public class PlayerHandStateObsever : IInitializable, IDisposable
         if ((newState & PlayerHandState.None) != 0)
         {
             Debug.Log("Player is Stretching");
-            // Stretching ˆ—
+            // Stretching å‡¦ç†
         }
 
         if ((newState & PlayerHandState.Catching) != 0)
         {
             Debug.Log("Player is Rotating Left");
-            // Rotating Left ˆ—
+            // Rotating Left å‡¦ç†
         }
 
-        // ‘¼‚Ìó‘Ô‚à“¯—l‚É
+        // ä»–ã®çŠ¶æ…‹ã‚‚åŒæ§˜ã«
     }
 
     public void Dispose()

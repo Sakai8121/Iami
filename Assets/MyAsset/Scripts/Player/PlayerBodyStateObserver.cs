@@ -9,11 +9,11 @@ public class PlayerBodyStateObserver : IInitializable, IDisposable
 {
     readonly PlayerBodyStateHolder _stateHolder;
     readonly CompositeDisposable _disposables = new();
-
-    [Inject]
+    
     readonly Dictionary<PlayerBodyState, Action> _stateActions;
-
-    public PlayerBodyStateObserver(PlayerBodyStateHolder stateHolder)
+    
+    [Inject]
+    public PlayerBodyStateObserver(PlayerBodyStateHolder stateHolder,BodyPhysicsDataCalculator bodyPhysicsDataCalculator)
     {
         _stateHolder = stateHolder;
 
@@ -22,14 +22,22 @@ public class PlayerBodyStateObserver : IInitializable, IDisposable
             { PlayerBodyState.Stretching, () => {
                 Debug.Log("Player is Stretching");
                 // Stretching ÇÃèàóù
+                bodyPhysicsDataCalculator.StartStretch();
+            }},
+            { PlayerBodyState.Contracted, () => {
+                Debug.Log("Player is Contracted");
+                // Stretching ÇÃèàóù
+                bodyPhysicsDataCalculator.StartContract();
             }},
             { PlayerBodyState.RotatingLeft, () => {
                 Debug.Log("Player is Rotating Left");
                 // Rotating Left ÇÃèàóù
+                bodyPhysicsDataCalculator.StartRotateLeft();
             }},
             { PlayerBodyState.RotatingRight, () => {
                 Debug.Log("Player is Rotating Right");
                 // Rotating Right ÇÃèàóù
+                bodyPhysicsDataCalculator.StartRotateRight();
             }},
             // ïKóvÇ…âûÇ∂Çƒí«â¡
         };
@@ -49,6 +57,7 @@ public class PlayerBodyStateObserver : IInitializable, IDisposable
         {
             if ((newState & kvp.Key) != 0)
             {
+                Debug.Log(kvp.Key);
                 kvp.Value.Invoke();
             }
         }

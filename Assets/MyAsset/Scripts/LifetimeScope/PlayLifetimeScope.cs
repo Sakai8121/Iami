@@ -11,10 +11,12 @@ public class PlayLifetimeScope : LifetimeScope
         builder.Register<PlayerBodyStateHolder>(Lifetime.Scoped);
         builder.Register<PlayerHandStateHolder>(Lifetime.Scoped);
         builder.Register<BodyPhysicsDataCalculator>(Lifetime.Scoped);
-
-        builder.RegisterEntryPoint<PlayerInputController>();
+        
+        //InitializedやITickableを使いたいとき、他のクラスから参照されるだけのとき（AsSelfをつける）
+        //他のクラスを参照したいときはRegister
+        builder.RegisterEntryPoint<PlayerInputController>().AsSelf();
         builder.RegisterEntryPoint<PlayerBodyStateObserver>();
-        builder.RegisterEntryPoint<PlayerHandStateObsever>();
+        builder.RegisterEntryPoint<PlayerHandStateObserver>();
         builder.RegisterEntryPoint<BodyDataObserver>();
 
         // MonoBehaviourの登録
