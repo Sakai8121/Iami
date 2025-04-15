@@ -1,30 +1,35 @@
 # nullable enable
 
+using UniRx;
 using VContainer;
 
 public class PlayerHandStateHolder
 {
-    PlayerHandState _currentPlayerHandState;
+    private readonly ReactiveProperty<PlayerHandState> _currentPlayerState = new(PlayerHandState.None);
+    public IReadOnlyReactiveProperty<PlayerHandState> CurrentPlayerState => _currentPlayerState;
 
     public void AddPlayerBodyState(PlayerHandState playState)
     {
+        var current = _currentPlayerState.Value;
+
         if (playState == PlayerHandState.Catching)
-            RemovePlayerBodyState(PlayerHandState.None);
+            current &= ~PlayerHandState.None;
 
         if (playState == PlayerHandState.None)
-            RemovePlayerBodyState(PlayerHandState.Catching);
+            current &= ~PlayerHandState.Catching;
 
-        _currentPlayerHandState |= playState;
+        current |= playState;
+        _currentPlayerState.Value = current;
     }
 
     public void RemovePlayerBodyState(PlayerHandState playState)
     {
-        _currentPlayerHandState &= ~playState;
+        _currentPlayerState.Value &= ~playState;
     }
 
     public bool IsContainState(PlayerHandState playState)
     {
-        return (_currentPlayerHandState & playState) != 0;
+        return (_currentPlayerState.Value & playState) != 0;
     }
 }
 

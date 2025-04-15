@@ -1,10 +1,12 @@
 #nullable enable
 
+using UniRx;
 using VContainer;
 
 public class PlayerBodyStateHolder
 {
-    PlayerBodyState _currentPlayerState;
+    private readonly ReactiveProperty<PlayerBodyState> _currentPlayerState = new(PlayerBodyState.None);
+    public IReadOnlyReactiveProperty<PlayerBodyState> CurrentPlayerState => _currentPlayerState;
 
     [Inject]
     public PlayerBodyStateHolder(PlayerInputController playerInputController)
@@ -15,28 +17,31 @@ public class PlayerBodyStateHolder
         playerInputController.RotateRightAction += () => AddPlayerBodyState(PlayerBodyState.RotatingRight);
     }
 
-
     public void AddPlayerBodyState(PlayerBodyState playState)
     {
+        var current = _currentPlayerState.Value;
+
         if (playState == PlayerBodyState.Stretching)
-            RemovePlayerBodyState(PlayerBodyState.Contracted);
+            current &= ~PlayerBodyState.Contracted;
 
         if (playState == PlayerBodyState.Contracted)
-            RemovePlayerBodyState(PlayerBodyState.Stretching);
+            current &= ~PlayerBodyState.Stretching;
 
-        _currentPlayerState |= playState;
+        current |= playState;
+        _currentPlayerState.Value = current;
     }
 
     public void RemovePlayerBodyState(PlayerBodyState playState)
     {
-        _currentPlayerState &= ~playState;
+        _currentPlayerState.Value &= ~playState;
     }
 
     public bool IsContainState(PlayerBodyState playState)
     {
-        return (_currentPlayerState & playState) != 0;
+        return (_currentPlayerState.Value & playState) != 0;
     }
 }
+
 
 [System.Flags]
 public enum PlayerBodyState
