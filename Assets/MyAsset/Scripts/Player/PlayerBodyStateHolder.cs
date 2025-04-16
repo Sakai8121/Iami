@@ -19,29 +19,29 @@ public class PlayerBodyStateHolder
 
     void AddPlayerBodyState(PlayerBodyState playState)
     {
-        var current = _currentPlayerState.Value;
+        var before = _currentPlayerState.Value;
+        var current = before;
 
-        //ストレッチモードになるならコントラクトモードはやめる
+        // ストレッチモードになるならコントラクトモードはやめる
         if (playState == PlayerBodyState.Stretching)
             current &= ~PlayerBodyState.Contracted;
 
-        //コントラクトモードになるならストレッチモードはやめる
+        // コントラクトモードになるならストレッチモードはやめる
         if (playState == PlayerBodyState.Contracted)
             current &= ~PlayerBodyState.Stretching;
-        
-        //左回転しようとしたとき回転キャンセル中なら回転の入力を受け付けない
-        if(playState == PlayerBodyState.RotatingLeft && IsContainState(PlayerBodyState.CancelRotate))
+
+        // 回転キャンセル中は回転を受け付けない
+        if (playState == PlayerBodyState.RotatingLeft && IsContainState(PlayerBodyState.CancelRotate))
             return;
-        //右回転しようとしたとき回転キャンセル中なら回転の入力を受け付けない
-        if(playState == PlayerBodyState.RotatingRight && IsContainState(PlayerBodyState.CancelRotate))
+        if (playState == PlayerBodyState.RotatingRight && IsContainState(PlayerBodyState.CancelRotate))
             return;
-        //左回転しようとしたとき右回転中ならキャンセル回転する(回転前の位置にもどる処理)
+
+        // 左→右 or 右→左 の回転中ならキャンセル処理
         if (playState == PlayerBodyState.RotatingLeft && IsContainState(PlayerBodyState.RotatingRight))
         {
             current &= ~PlayerBodyState.RotatingRight;
             playState = PlayerBodyState.CancelRotate;
         }
-        //右回転しようとしたとき左回転中ならキャンセル回転する(回転前の位置にもどる処理)
         if (playState == PlayerBodyState.RotatingRight && IsContainState(PlayerBodyState.RotatingLeft))
         {
             current &= ~PlayerBodyState.RotatingLeft;
@@ -49,8 +49,23 @@ public class PlayerBodyStateHolder
         }
 
         current |= playState;
+
+        // 差分をログに出力
+        var added = current & ~before;
+        var removed = before & ~current;
+
+        if (added != PlayerBodyState.None)
+        {
+            UnityEngine.Debug.Log($"[PlayerState] Added: {added}");
+        }
+        if (removed != PlayerBodyState.None)
+        {
+            UnityEngine.Debug.Log($"[PlayerState] Removed: {removed}");
+        }
+
         _currentPlayerState.Value = current;
     }
+
 
     public void RemovePlayerBodyState(PlayerBodyState playState)
     {

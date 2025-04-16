@@ -19,11 +19,11 @@ public class BodyPhysicsDataCalculator
     const float minBodySize = 1.0f;
     const float rotateValue = 90;
 
-    const float stretchSpeed = 1.5f;
+    const float stretchSpeed = 3f;
     const float contractSpeed = 3f;
     const float rotateSpeed = 120.0f;
     
-    const float cancelRotationSpeed = 360f; // 1秒で360度回転する速度
+    const float cancelRotationSpeed = 120.0f; // 1秒で360度回転する速度
 
     const float bodyXSize = 0.35f;
 
@@ -63,6 +63,9 @@ public class BodyPhysicsDataCalculator
 
     public void StartRotateRight()
     {
+        if(_currentRotateState == RotateState.Right)
+            return;
+
         _currentRotateState = RotateState.Right;
         
         _rotateCts?.Cancel();
@@ -73,6 +76,9 @@ public class BodyPhysicsDataCalculator
 
     public void StartRotateLeft()
     {
+        if (_currentRotateState == RotateState.Left)
+            return;
+
         _currentRotateState = RotateState.Left;
         
         _rotateCts?.Cancel();
@@ -83,6 +89,9 @@ public class BodyPhysicsDataCalculator
 
     public void CancelRotate()
     {
+        if (_currentRotateState == RotateState.Cancel)
+            return;
+
         _currentRotateState = RotateState.Cancel;
         
         _rotateCts?.Cancel();
@@ -134,10 +143,12 @@ public class BodyPhysicsDataCalculator
         }
 
         _preRotation = BodyRotation.Value;
+
         if (_currentRotateState == RotateState.Right)
             EndRotateRightAction();
         else if (_currentRotateState == RotateState.Left)
             EndRotateLeftAction();
+        _currentRotateState = RotateState.None;
     }
 
 
@@ -160,7 +171,9 @@ public class BodyPhysicsDataCalculator
         // 誤差が残らないように最終的にピッタリ合わせる
         BodyRotation.Value = targetRotation;
         _preRotation = targetRotation;
+
         EndCancelRotateAction();
+        _currentRotateState = RotateState.None;
     }
 
 }

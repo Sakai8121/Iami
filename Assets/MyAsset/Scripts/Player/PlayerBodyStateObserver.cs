@@ -20,27 +20,22 @@ public class PlayerBodyStateObserver : IInitializable, IDisposable
         _stateActions = new Dictionary<PlayerBodyState, Action>
         {
             { PlayerBodyState.Stretching, () => {
-                Debug.Log("Player is Stretching");
                 // Stretching ÇÃèàóù
                 bodyPhysicsDataCalculator.StartStretch();
             }},
             { PlayerBodyState.Contracted, () => {
-                Debug.Log("Player is Contracted");
                 // Stretching ÇÃèàóù
                 bodyPhysicsDataCalculator.StartContract();
             }},
             { PlayerBodyState.RotatingLeft, () => {
-                Debug.Log("Player is Rotating Left");
                 // Rotating Left ÇÃèàóù
                 bodyPhysicsDataCalculator.StartRotateLeft();
             }},
             { PlayerBodyState.RotatingRight, () => {
-                Debug.Log("Player is Rotating Right");
                 // Rotating Right ÇÃèàóù
                 bodyPhysicsDataCalculator.StartRotateRight();
             }},
             { PlayerBodyState.CancelRotate, () => {
-                Debug.Log("Player is Rotating Right");
                 // Rotating Right ÇÃèàóù
                 bodyPhysicsDataCalculator.CancelRotate();
             }},
@@ -71,7 +66,6 @@ public class PlayerBodyStateObserver : IInitializable, IDisposable
         {
             if ((newState & kvp.Key) != 0)
             {
-                Debug.Log(kvp.Key);
                 kvp.Value.Invoke();
             }
         }
