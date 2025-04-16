@@ -15,4 +15,9 @@ public class PlayerBodyViewMono: MonoBehaviour
     {
         playerBodyTransform.rotation = rotation;
     }
+
+    public void ChangePosition(Vector3 position)
+    {
+        playerBodyTransform.position = position;
+    }
 }

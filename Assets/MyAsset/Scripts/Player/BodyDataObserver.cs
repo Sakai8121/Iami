@@ -17,6 +17,11 @@ public class BodyDataObserver : IInitializable
         {
             bodyViewMono.ChangeRotation(rotation);
         };
+        
+        bodyPhysicsDataCalculator.BodyPosition.OnValueChanged += position =>
+        {
+            bodyViewMono.ChangePosition(position);
+        };
     }
     
     //エントリーポイント用

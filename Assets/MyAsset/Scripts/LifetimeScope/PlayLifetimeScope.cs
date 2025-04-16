@@ -21,6 +21,7 @@ public class PlayLifetimeScope : LifetimeScope
 
         // MonoBehaviourの登録
         builder.RegisterComponentInHierarchy<PlayerBodyViewMono>();
+        builder.RegisterComponentInHierarchy<BodyTransformHolderMono>();
     }
 
 }

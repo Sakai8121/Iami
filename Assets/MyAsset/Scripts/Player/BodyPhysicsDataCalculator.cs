@@ -8,6 +8,7 @@ public class BodyPhysicsDataCalculator
 {
     public ObservableProperty<Vector2> BodyScale { get; private set; }
     public ObservableProperty<Quaternion> BodyRotation { get; private set; }
+    public ObservableProperty<Vector3> BodyPosition { get; private set; }
 
     public event Action EndStretchAction = () => { };
     public event Action EndContractAction = () => { };
@@ -35,11 +36,16 @@ public class BodyPhysicsDataCalculator
     Quaternion _preRotation;
     RotateState _currentRotateState;
 
+    readonly BodyTransformHolderMono _bodyTransformHolderMono;
+
     [Inject]
-    public BodyPhysicsDataCalculator()
+    public BodyPhysicsDataCalculator(BodyTransformHolderMono bodyTransformHolderMono)
     {
+        _bodyTransformHolderMono = bodyTransformHolderMono;
+        
         BodyScale = new ObservableProperty<Vector2>(new Vector2(bodyXSize, minBodySize));
         BodyRotation = new ObservableProperty<Quaternion>(Quaternion.identity);
+        BodyPosition = new ObservableProperty<Vector3>(new Vector3(0,0,0));
 
         _preRotation = Quaternion.identity;
         _currentRotateState = RotateState.None;
@@ -117,7 +123,9 @@ public class BodyPhysicsDataCalculator
         while (BodyScale.Value.y > minBodySize)
         {
             token.ThrowIfCancellationRequested();
-            BodyScale.Value = new Vector2(bodyXSize, BodyScale.Value.y - contractSpeed * Time.deltaTime);
+            float changeScale = contractSpeed * Time.deltaTime;
+            BodyScale.Value = new Vector2(bodyXSize, BodyScale.Value.y - changeScale);
+            InchwormMove(changeScale);
             await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
         BodyScale.Value = new Vector2(bodyXSize, minBodySize);
@@ -176,6 +184,10 @@ public class BodyPhysicsDataCalculator
         _currentRotateState = RotateState.None;
     }
 
+    void InchwormMove(float changeScale)
+    {
+        BodyPosition.Value = _bodyTransformHolderMono.BodyPosition() + _bodyTransformHolderMono.TransformUp() * changeScale;
+    }
 }
 
 enum RotateState
