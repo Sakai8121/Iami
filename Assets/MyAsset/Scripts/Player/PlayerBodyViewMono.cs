@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerBodyViewMono: MonoBehaviour
 {
     [SerializeField] Transform playerBodyTransform = null!;
+    [SerializeField] Transform pivotTransform = null!;
 
     public void ChangeBodyView(Vector2 scale)
     {
@@ -13,7 +14,7 @@ public class PlayerBodyViewMono: MonoBehaviour
 
     public void ChangeRotation(Quaternion rotation)
     {
-        playerBodyTransform.rotation = rotation;
+        pivotTransform.localRotation = rotation;
     }
 
     public void ChangePosition(Vector3 position)

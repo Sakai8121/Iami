@@ -5,21 +5,29 @@ using VContainer;
 
 public class PlayerBodyStateHolder
 {
-    readonly ReactiveProperty<PlayerBodyState> _currentPlayerState = new(PlayerBodyState.None);
-    public IReadOnlyReactiveProperty<PlayerBodyState> CurrentPlayerState => _currentPlayerState;
+    readonly ReactiveProperty<PlayerBodyState> _currentPlayerBodyState = new(PlayerBodyState.None);
+    public IReadOnlyReactiveProperty<PlayerBodyState> CurrentPlayerBodyState => _currentPlayerBodyState;
 
     [Inject]
-    public PlayerBodyStateHolder(PlayerInputController playerInputController)
+    public PlayerBodyStateHolder(PlayerInputController playerInputController,BodyColliderStateHolder bodyColliderStateHolder)
     {
         playerInputController.StartStretchAction += () => AddPlayerBodyState(PlayerBodyState.Stretching);
         playerInputController.EndStretchAction += () => AddPlayerBodyState(PlayerBodyState.Contracted);
-        playerInputController.RotateLeftAction += () => AddPlayerBodyState(PlayerBodyState.RotatingLeft);
-        playerInputController.RotateRightAction += () => AddPlayerBodyState(PlayerBodyState.RotatingRight);
+        playerInputController.RotateLeftAction += () =>
+        {
+            bodyColliderStateHolder.ChangeBodyPivot(-1);
+            AddPlayerBodyState(PlayerBodyState.RotatingLeft);
+        };
+        playerInputController.RotateRightAction += () =>
+        {
+            bodyColliderStateHolder.ChangeBodyPivot(1);
+            AddPlayerBodyState(PlayerBodyState.RotatingRight);
+        };
     }
 
     void AddPlayerBodyState(PlayerBodyState playState)
     {
-        var before = _currentPlayerState.Value;
+        var before = _currentPlayerBodyState.Value;
         var current = before;
 
         // ストレッチモードになるならコントラクトモードはやめる
@@ -54,27 +62,27 @@ public class PlayerBodyStateHolder
         var added = current & ~before;
         var removed = before & ~current;
 
-        if (added != PlayerBodyState.None)
-        {
-            UnityEngine.Debug.Log($"[PlayerState] Added: {added}");
-        }
-        if (removed != PlayerBodyState.None)
-        {
-            UnityEngine.Debug.Log($"[PlayerState] Removed: {removed}");
-        }
+        // if (added != PlayerBodyState.None)
+        // {
+        //     UnityEngine.Debug.Log($"[PlayerState] Added: {added}");
+        // }
+        // if (removed != PlayerBodyState.None)
+        // {
+        //     UnityEngine.Debug.Log($"[PlayerState] Removed: {removed}");
+        // }
 
-        _currentPlayerState.Value = current;
+        _currentPlayerBodyState.Value = current;
     }
 
 
     public void RemovePlayerBodyState(PlayerBodyState playState)
     {
-        _currentPlayerState.Value &= ~playState;
+        _currentPlayerBodyState.Value &= ~playState;
     }
 
     bool IsContainState(PlayerBodyState playState)
     {
-        return (_currentPlayerState.Value & playState) != 0;
+        return (_currentPlayerBodyState.Value & playState) != 0;
     }
 }
 

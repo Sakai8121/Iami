@@ -16,4 +16,9 @@ public class BodyTransformHolderMono: MonoBehaviour
     {
         return bodyTransform.up;
     }
+    
+    public float RotateZ()
+    {
+        return bodyTransform.rotation.eulerAngles.z;
+    }
 }

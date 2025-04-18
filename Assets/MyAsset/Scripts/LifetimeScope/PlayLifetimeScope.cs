@@ -11,6 +11,7 @@ public class PlayLifetimeScope : LifetimeScope
         builder.Register<PlayerBodyStateHolder>(Lifetime.Scoped);
         builder.Register<PlayerHandStateHolder>(Lifetime.Scoped);
         builder.Register<BodyPhysicsDataCalculator>(Lifetime.Scoped);
+        builder.Register<BodyColliderStateHolder>(Lifetime.Scoped);
         
         //InitializedやITickableを使いたいとき、他のクラスから参照されるだけのとき（AsSelfをつける）
         //他のクラスを参照したいときはRegister
@@ -22,6 +23,7 @@ public class PlayLifetimeScope : LifetimeScope
         // MonoBehaviourの登録
         builder.RegisterComponentInHierarchy<PlayerBodyViewMono>();
         builder.RegisterComponentInHierarchy<BodyTransformHolderMono>();
+        builder.RegisterComponentInHierarchy<BodyPivotChangerMono>();
     }
 
 }
