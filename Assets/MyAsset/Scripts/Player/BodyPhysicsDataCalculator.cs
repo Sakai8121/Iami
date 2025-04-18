@@ -24,9 +24,9 @@ public class BodyPhysicsDataCalculator
     const float contractSpeed = 3f;
     const float rotateSpeed = 120.0f;
     
-    const float cancelRotationSpeed = 120.0f; // 1秒で360度回転する速度
+    const float cancelRotationSpeed = 360.0f; // 1秒で360度回転する速度
 
-    const float bodyXSize = 0.35f;
+    const float bodyXSize = 1f;
 
     CancellationTokenSource _stretchCts;
     CancellationTokenSource _contractCts;
@@ -186,7 +186,7 @@ public class BodyPhysicsDataCalculator
 
     void InchwormMove(float changeScale)
     {
-        BodyPosition.Value = _bodyTransformHolderMono.BodyPosition() + _bodyTransformHolderMono.TransformUp() * changeScale;
+        BodyPosition.Value = _bodyTransformHolderMono.ScalePivotPosition() + _bodyTransformHolderMono.TransformUp() * changeScale;
     }
 }
 

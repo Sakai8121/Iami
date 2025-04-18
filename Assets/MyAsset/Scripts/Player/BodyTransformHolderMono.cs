@@ -6,15 +6,16 @@ using UnityEngine;
 public class BodyTransformHolderMono: MonoBehaviour
 {
     [SerializeField] Transform bodyTransform = null!;
+    [SerializeField] Transform scalePivotTransform = null!;
 
-    public Vector3 BodyPosition()
+    public Vector3 ScalePivotPosition()
     {
-        return bodyTransform.position;
+        return scalePivotTransform.position;
     }
 
     public Vector3 TransformUp()
     {
-        return bodyTransform.up;
+        return scalePivotTransform.up;
     }
     
     public float RotateZ()

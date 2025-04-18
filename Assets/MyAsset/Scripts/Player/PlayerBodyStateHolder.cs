@@ -8,21 +8,17 @@ public class PlayerBodyStateHolder
     readonly ReactiveProperty<PlayerBodyState> _currentPlayerBodyState = new(PlayerBodyState.None);
     public IReadOnlyReactiveProperty<PlayerBodyState> CurrentPlayerBodyState => _currentPlayerBodyState;
 
+    BodyColliderStateHolder _bodyColliderStateHolder;
+
     [Inject]
     public PlayerBodyStateHolder(PlayerInputController playerInputController,BodyColliderStateHolder bodyColliderStateHolder)
     {
+        _bodyColliderStateHolder = bodyColliderStateHolder;
+        
         playerInputController.StartStretchAction += () => AddPlayerBodyState(PlayerBodyState.Stretching);
         playerInputController.EndStretchAction += () => AddPlayerBodyState(PlayerBodyState.Contracted);
-        playerInputController.RotateLeftAction += () =>
-        {
-            bodyColliderStateHolder.ChangeBodyPivot(-1);
-            AddPlayerBodyState(PlayerBodyState.RotatingLeft);
-        };
-        playerInputController.RotateRightAction += () =>
-        {
-            bodyColliderStateHolder.ChangeBodyPivot(1);
-            AddPlayerBodyState(PlayerBodyState.RotatingRight);
-        };
+        playerInputController.RotateLeftAction += () => AddPlayerBodyState(PlayerBodyState.RotatingLeft);
+        playerInputController.RotateRightAction += () => AddPlayerBodyState(PlayerBodyState.RotatingRight);
     }
 
     void AddPlayerBodyState(PlayerBodyState playState)
@@ -55,6 +51,12 @@ public class PlayerBodyStateHolder
             current &= ~PlayerBodyState.RotatingLeft;
             playState = PlayerBodyState.CancelRotate;
         }
+        
+        //Rotateする前にピボットを切り替える
+        if(playState == PlayerBodyState.RotatingLeft && !IsContainState(PlayerBodyState.RotatingLeft))
+            _bodyColliderStateHolder.ChangeBodyPivot(-1);
+        if(playState == PlayerBodyState.RotatingRight && !IsContainState(PlayerBodyState.RotatingRight))
+            _bodyColliderStateHolder.ChangeBodyPivot(1);
 
         current |= playState;
 

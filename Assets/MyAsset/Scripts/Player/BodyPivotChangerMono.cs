@@ -6,6 +6,7 @@ using VContainer;
 public class BodyPivotChangerMono : MonoBehaviour
 {
     [SerializeField] Transform parentTransform = null!;
+    [SerializeField] Transform scalePivotTransform = null!;
     [SerializeField] Transform childTransform = null!;
     
     [Inject]
@@ -25,11 +26,11 @@ public class BodyPivotChangerMono : MonoBehaviour
                 if (bodyColliderDirection == BodyColliderDirection.Under)
                 {
                     pivotPosition.x = pivotX * (-1);
-                    pivotPosition.y = pivotY * (-1);
+                    pivotPosition.y = pivotY * (-1) + 0.5f;
                 }
                 else if (bodyColliderDirection == BodyColliderDirection.Left)
                 {
-                    pivotPosition.x = pivotY;
+                    pivotPosition.x = pivotY - 0.5f;
                     pivotPosition.y = pivotX * (-1);
                 }
                 break;
@@ -37,11 +38,11 @@ public class BodyPivotChangerMono : MonoBehaviour
                 if (bodyColliderDirection == BodyColliderDirection.Under)
                 {
                     pivotPosition.x = pivotX;
-                    pivotPosition.y = pivotY * (-1);
+                    pivotPosition.y = pivotY * (-1) + 0.5f;
                 }
                 else if (bodyColliderDirection == BodyColliderDirection.Right)
                 {
-                    pivotPosition.x = pivotY * (-1);
+                    pivotPosition.x = pivotY * (-1) + 0.5f;
                     pivotPosition.y = pivotX * (-1);
                 }
                 break;
@@ -49,11 +50,11 @@ public class BodyPivotChangerMono : MonoBehaviour
                 if (bodyColliderDirection == BodyColliderDirection.Up)
                 {
                     pivotPosition.x = pivotX;
-                    pivotPosition.y = pivotY * (-1);
+                    pivotPosition.y = pivotY * (-1) - 0.5f;
                 }
                 else if (bodyColliderDirection == BodyColliderDirection.Left)
                 {
-                    pivotPosition.x = pivotY * (-1);
+                    pivotPosition.x = pivotY * (-1) - 0.5f;
                     pivotPosition.y = pivotX * (-1);
                 }
                 break;
@@ -61,17 +62,17 @@ public class BodyPivotChangerMono : MonoBehaviour
                 if (bodyColliderDirection == BodyColliderDirection.Up)
                 {
                     pivotPosition.x = pivotX * (-1);
-                    pivotPosition.y = pivotY * (-1);
+                    pivotPosition.y = pivotY * (-1) - 0.5f;
                 }
                 else if (bodyColliderDirection == BodyColliderDirection.Right)
                 {
-                    pivotPosition.x = pivotY;
+                    pivotPosition.x = pivotY + 0.5f;
                     pivotPosition.y = pivotX * (-1);
                 }
                 break;
         }
-        childTransform.parent = null;
-        parentTransform.position = childTransform.position + pivotPosition;
-        childTransform.parent = parentTransform;
+        scalePivotTransform.parent = null;
+        parentTransform.position = scalePivotTransform.position + pivotPosition;
+        scalePivotTransform.parent = parentTransform;
     }
 }
