@@ -65,16 +65,40 @@ public class EntityFactoryMono : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            var entityObj = Instantiate(prefab, GetRandomPosition(), Quaternion.identity, spawnParent);
+            var entityObj = Instantiate(prefab, GetAlignedPosition(i,count), Quaternion.identity, spawnParent);
             var entity = entityObj.GetComponent<IEntity>();
             entity?.Init(moveSpeed, actionInterval);
         }
     }
 
-    Vector2 GetRandomPosition()
+    Vector2 GetAlignedPosition(int index, int count)
     {
-        return new Vector2(Random.Range(-5f, 5f), Random.Range(-5f, 5f));
+        int columns = 6;            // 横に並べる数（偶数推奨）
+        float spacing = 1.5f;       // 各オブジェクト間の距離
+        float centerGap = 3.0f;     // 中央に空けるスペース（横幅）
+
+        int rows = Mathf.CeilToInt((float)count / columns);
+        int row = index / columns;
+        int col = index % columns;
+
+        float xOffset = col * spacing;
+
+        // 中央より右の列は gap 分右に寄せる
+        if (col >= columns / 2)
+            xOffset += centerGap;
+
+        // 全体の横幅から中央基準で揃える
+        float totalWidth = columns * spacing + centerGap;
+        float originX = -totalWidth / 2f + spacing / 2f;
+
+        // 縦方向の揃え（中央から上下に並べたい場合の調整）
+        float totalHeight = rows * spacing;
+        float originY = totalHeight / 2f - spacing / 2f;
+
+        Vector2 position = new Vector2(originX + xOffset, originY - row * spacing);
+        return position;
     }
+
 }
 
 public enum EntityKind
