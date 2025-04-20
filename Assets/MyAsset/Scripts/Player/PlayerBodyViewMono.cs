@@ -14,7 +14,7 @@ public class PlayerBodyViewMono: MonoBehaviour
 
     public void ChangeRotation(Quaternion rotation)
     {
-        pivotTransform.localRotation = rotation;
+        scalePivotTransform.localRotation = rotation;
     }
 
     public void ChangePosition(Vector3 position)

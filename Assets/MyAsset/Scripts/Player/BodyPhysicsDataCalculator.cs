@@ -16,15 +16,15 @@ public class BodyPhysicsDataCalculator
     public event Action EndRotateLeftAction = () => { };
     public event Action EndCancelRotateAction = () => { };
 
-    const float maxBodySize = 5.0f;
+    const float maxBodySize = 3.0f;
     const float minBodySize = 1.0f;
     const float rotateValue = 90;
 
-    const float stretchSpeed = 3f;
-    const float contractSpeed = 3f;
-    const float rotateSpeed = 120.0f;
+    const float stretchSpeed = 10f;
+    const float contractSpeed = 10f;
+    const float rotateSpeed = 720.0f;
     
-    const float cancelRotationSpeed = 360.0f; // 1秒で360度回転する速度
+    const float cancelRotationSpeed = 720.0f; // 1秒で360度回転する速度
 
     const float bodyXSize = 1f;
 

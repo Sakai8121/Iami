@@ -24,6 +24,7 @@ public class PlayLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<PlayerBodyViewMono>();
         builder.RegisterComponentInHierarchy<BodyTransformHolderMono>();
         builder.RegisterComponentInHierarchy<BodyPivotChangerMono>();
+        builder.RegisterComponentInHierarchy<BodyColliderViewMono>();
     }
 
 }

@@ -1,6 +1,7 @@
 #nullable enable
 
 using UniRx;
+using UnityEngine;
 using VContainer;
 
 public class PlayerBodyStateHolder
@@ -9,11 +10,14 @@ public class PlayerBodyStateHolder
     public IReadOnlyReactiveProperty<PlayerBodyState> CurrentPlayerBodyState => _currentPlayerBodyState;
 
     BodyColliderStateHolder _bodyColliderStateHolder;
-
+    BodyTransformHolderMono _bodyTransformHolderMono;
+    
     [Inject]
-    public PlayerBodyStateHolder(PlayerInputController playerInputController,BodyColliderStateHolder bodyColliderStateHolder)
+    public PlayerBodyStateHolder(PlayerInputController playerInputController,BodyColliderStateHolder bodyColliderStateHolder,
+        BodyTransformHolderMono bodyTransformHolderMono)
     {
         _bodyColliderStateHolder = bodyColliderStateHolder;
+        _bodyTransformHolderMono = bodyTransformHolderMono;
         
         playerInputController.StartStretchAction += () => AddPlayerBodyState(PlayerBodyState.Stretching);
         playerInputController.EndStretchAction += () => AddPlayerBodyState(PlayerBodyState.Contracted);
@@ -21,7 +25,33 @@ public class PlayerBodyStateHolder
         playerInputController.RotateRightAction += () => AddPlayerBodyState(PlayerBodyState.RotatingRight);
     }
 
-    void AddPlayerBodyState(PlayerBodyState playState)
+    public void CancelStretch(BodyColliderDirection bodyColliderDirection)
+    {
+        var transformUp = _bodyTransformHolderMono.TransformUp();
+        Debug.LogError($"{transformUp} {bodyColliderDirection}");
+        if (transformUp == Vector3.up)
+        {
+            if(bodyColliderDirection == BodyColliderDirection.Up)
+                RemovePlayerBodyState(PlayerBodyState.Stretching);
+        }
+        else if (transformUp == Vector3.down)
+        {
+            if(bodyColliderDirection == BodyColliderDirection.Under)
+                RemovePlayerBodyState(PlayerBodyState.Stretching);
+        }
+        else if (transformUp == Vector3.right)
+        {
+            if(bodyColliderDirection == BodyColliderDirection.Right)
+                RemovePlayerBodyState(PlayerBodyState.Stretching);
+        }
+        else if (transformUp == Vector3.left)
+        {
+            if(bodyColliderDirection == BodyColliderDirection.Left)
+                RemovePlayerBodyState(PlayerBodyState.Stretching);
+        }
+    }
+
+    public void AddPlayerBodyState(PlayerBodyState playState)
     {
         var before = _currentPlayerBodyState.Value;
         var current = before;
@@ -50,6 +80,13 @@ public class PlayerBodyStateHolder
         {
             current &= ~PlayerBodyState.RotatingLeft;
             playState = PlayerBodyState.CancelRotate;
+        }
+        
+        // キャンセル処理なら左右回転を元に戻す
+        if (playState == PlayerBodyState.CancelRotate)
+        {
+            current &= ~PlayerBodyState.RotatingRight;
+            current &= ~PlayerBodyState.RotatingLeft;
         }
         
         //Rotateする前にピボットを切り替える

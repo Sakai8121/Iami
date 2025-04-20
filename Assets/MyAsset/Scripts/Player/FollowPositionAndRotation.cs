@@ -12,7 +12,7 @@ public class FollowPositionFromTop : MonoBehaviour
         if (target == null) return;
 
         // 上端のワールド座標を求める
-        Vector3 top = target.position + target.up * (target.localScale.y);
+        Vector3 top = target.position + target.up * (target.lossyScale.y/2.0f);
 
         // オフセットをtargetのローカル空間からワールド空間へ変換
         Vector3 offsetWorld = target.TransformDirection(offsetFromTop);

@@ -17,12 +17,13 @@ public class PlayerBodyStateObserver : IInitializable, IDisposable
     
     [Inject]
     public PlayerBodyStateObserver(PlayerBodyStateHolder stateHolder,BodyPhysicsDataCalculator bodyPhysicsDataCalculator,
-        BodyColliderStateHolder bodyColliderStateHolder,BodyTransformHolderMono bodyTransformHolderMono)
+        BodyColliderStateHolder bodyColliderStateHolder,BodyTransformHolderMono bodyTransformHolderMono,
+        BodyColliderViewMono bodyColliderViewMono)
     {
         _stateHolder = stateHolder;
         _bodyTransformHolderMono = bodyTransformHolderMono;
         _bodyColliderStateHolder = bodyColliderStateHolder;
-
+        
         _stateActions = new Dictionary<PlayerBodyState, Action>
         {
             { PlayerBodyState.Stretching, () => {
@@ -54,6 +55,9 @@ public class PlayerBodyStateObserver : IInitializable, IDisposable
         bodyPhysicsDataCalculator.EndRotateLeftAction += EndRotateLeftAction;
         bodyPhysicsDataCalculator.EndCancelRotateAction +=
             () => stateHolder.RemovePlayerBodyState(PlayerBodyState.CancelRotate);
+
+        bodyColliderViewMono.CallCancelRotateAction += () => stateHolder.AddPlayerBodyState(PlayerBodyState.CancelRotate);
+        bodyColliderViewMono.CallCancelStretchAction += stateHolder.CancelStretch;
     }
 
     public void Initialize()
