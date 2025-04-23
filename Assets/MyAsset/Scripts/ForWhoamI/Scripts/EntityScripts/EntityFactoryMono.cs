@@ -3,6 +3,7 @@
 using UnityEngine;
 
 using UnityEngine;
+using VContainer;
 
 public class EntityFactoryMono : MonoBehaviour
 {
@@ -13,14 +14,21 @@ public class EntityFactoryMono : MonoBehaviour
     [SerializeField] GameObject heartPrefab = null!;
     [SerializeField] GameObject squarePrefab = null!;
 
-    [Header("Spawn Settings")]
-    [SerializeField] int circleCount = 30;
-    [SerializeField] int starCount = 30;
-    [SerializeField] int gearCount = 10;
-    [SerializeField] int heartCount = 10;
-    [SerializeField] int squareCount = 3;
+    int circleCount = 24;
+    int starCount = 24;
+    int gearCount = 18;
+    int heartCount = 12;
+    int squareCount = 6;
 
     [SerializeField] Transform spawnParent = null!;
+
+    TruthCheckExecutor _truthCheckExecutor;
+
+    [Inject]
+    public void Construct(TruthCheckExecutor truthCheckExecutor)
+    {
+        _truthCheckExecutor = truthCheckExecutor;
+    }
 
     public void GenerateEntities(EntityKind entityKind)
     {
@@ -63,19 +71,23 @@ public class EntityFactoryMono : MonoBehaviour
                 break;
         }
 
+        int truthIndex = Random.Range(0, count);
         for (int i = 0; i < count; i++)
         {
+            bool isTruth = false;
+            if (i == truthIndex)
+                isTruth = true;
+
             var entityObj = Instantiate(prefab, GetAlignedPosition(i,count), Quaternion.identity, spawnParent);
             var entity = entityObj.GetComponent<IEntity>();
-            entity?.Init(moveSpeed, actionInterval);
+            entity?.Init(moveSpeed, actionInterval, isTruth, _truthCheckExecutor.CheckTruth);
         }
     }
 
     Vector2 GetAlignedPosition(int index, int count)
     {
         int columns = 6;            // 横に並べる数（偶数推奨）
-        float spacing = 1.5f;       // 各オブジェクト間の距離
-        float centerGap = 3.0f;     // 中央に空けるスペース（横幅）
+        float spacing = 3.0f;       // 各オブジェクト間の距離
 
         int rows = Mathf.CeilToInt((float)count / columns);
         int row = index / columns;
@@ -83,12 +95,8 @@ public class EntityFactoryMono : MonoBehaviour
 
         float xOffset = col * spacing;
 
-        // 中央より右の列は gap 分右に寄せる
-        if (col >= columns / 2)
-            xOffset += centerGap;
-
         // 全体の横幅から中央基準で揃える
-        float totalWidth = columns * spacing + centerGap;
+        float totalWidth = columns * spacing;
         float originX = -totalWidth / 2f + spacing / 2f;
 
         // 縦方向の揃え（中央から上下に並べたい場合の調整）

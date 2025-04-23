@@ -12,12 +12,15 @@ public class CircleEntityMono:MonoBehaviour,IEntity
 
     bool _isEnable;
     bool _isCaught;
+    bool _isTruth;
 
     float _acceleration = 5;
     float _moveSpeed;
     float _actionInterval;
     
     Coroutine? _actionLoopCoroutine;
+
+    Action<bool,IEntity> checkTruthAction;
 
     void FixedUpdate()
     {
@@ -27,8 +30,10 @@ public class CircleEntityMono:MonoBehaviour,IEntity
         Move();
     }
     
-    public void Init(float moveSpeed,float actionInterval)
+    public void Init(float moveSpeed,float actionInterval,bool isTruth,Action<bool,IEntity> checkTruth)
     {
+        _isTruth = isTruth;
+        checkTruthAction = checkTruth;
         _moveSpeed = moveSpeed;
         _actionInterval = actionInterval;
 
@@ -55,7 +60,17 @@ public class CircleEntityMono:MonoBehaviour,IEntity
 
     public void Caught()
     {
-        DisEnableEntity();
+        rb.rotation = 0;
+        rb.angularVelocity = 0;
+        rb.linearVelocity = new Vector2(0, 0);
+        rb.freezeRotation = true;
+        rb.constraints = RigidbodyConstraints2D.FreezePositionX
+                        | RigidbodyConstraints2D.FreezePositionY;
+        //中心に移動
+        transform.DOMove(PositionHolderStatic.goalPosition,TimeInfoStatic.waitMovingToGoalTime);
+
+        //本物かどうかを判定
+        checkTruthAction(_isTruth,this);
         _isCaught = true;
     }
 
@@ -75,6 +90,18 @@ public class CircleEntityMono:MonoBehaviour,IEntity
     {
         Destroy(this.gameObject);
         _isCaught = false;
+    }
+
+    public void SuccessAnimation()
+    {
+        //目を開くアニメーション
+
+    }
+
+    public void FailAnimation()
+    {
+        //燃え尽きるアニメーション（新しくマテリアルを生成する）
+
     }
     
     void StartActionLoop()

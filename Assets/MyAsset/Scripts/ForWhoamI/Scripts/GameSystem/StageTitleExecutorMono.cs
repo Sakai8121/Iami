@@ -9,7 +9,6 @@ public class StageTitleExecutorMono: MonoBehaviour
     [SerializeField] TextMeshProUGUI stageTitleText = null!;
     [SerializeField] RectTransform stageTitleRectTransform = null!;
 
-    [SerializeField] Vector2 finalAnchorPos = new Vector2(100, -100); // 左上の目的座標（Canvas上）
     [SerializeField] float finalScale = 1f;
 
     public void StageTitleAnimation(StageIndex stageIndex, float animationTime)
@@ -17,32 +16,18 @@ public class StageTitleExecutorMono: MonoBehaviour
         var stageTitle = ConvertStageTitle(stageIndex);
         stageTitleText.text = stageTitle;
 
-        // 初期状態セット（中央・拡大）
-        stageTitleText.alignment = TextAlignmentOptions.Center;
+        // 初期状態セット（中央表示、拡大）
+        stageTitleRectTransform.localScale = Vector3.one;
         stageTitleText.alpha = 0;
-        stageTitleRectTransform.localScale = Vector3.one * 2;
 
         float halfTime = animationTime / 2f;
 
         Sequence sequence = DOTween.Sequence();
 
-        // ① フェードイン（中央拡大）
+        // フェードイン（中央拡大）
         sequence.Append(stageTitleText.DOFade(1f, halfTime));
-
-        // ② 縮小＆左上に移動
-        sequence.AppendCallback(() =>
-        {
-            // 一度フェードアウトしてアライメントを変える
-            stageTitleText.DOFade(0f, 0.2f).OnComplete(() =>
-            {
-                stageTitleText.alignment = TextAlignmentOptions.TopLeft;
-                stageTitleText.DOFade(1f, 0.2f);
-            });
-        });
-
-        sequence.Join(stageTitleRectTransform.DOScale(finalScale, halfTime));
-        sequence.Join(stageTitleRectTransform.DOAnchorPos(finalAnchorPos, halfTime));
     }
+
 
     string ConvertStageTitle(StageIndex stageIndex)
     {
