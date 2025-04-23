@@ -58,8 +58,10 @@ public class CircleEntityMono:MonoBehaviour,IEntity
         transform.DORotate(new Vector3(0, 0, randomAngle), 0.5f, RotateMode.FastBeyond360);
     }
 
-    public void Caught()
+    public void Caught(Vector2 targetPosition)
     {
+        DisEnableEntity();
+        
         rb.rotation = 0;
         rb.angularVelocity = 0;
         rb.linearVelocity = new Vector2(0, 0);
@@ -67,7 +69,7 @@ public class CircleEntityMono:MonoBehaviour,IEntity
         rb.constraints = RigidbodyConstraints2D.FreezePositionX
                         | RigidbodyConstraints2D.FreezePositionY;
         //中心に移動
-        transform.DOMove(PositionHolderStatic.goalPosition,TimeInfoStatic.waitMovingToGoalTime);
+        transform.DOMove(targetPosition,TimeInfoStatic.waitMovingToGoalTime);
 
         //本物かどうかを判定
         checkTruthAction(_isTruth,this);

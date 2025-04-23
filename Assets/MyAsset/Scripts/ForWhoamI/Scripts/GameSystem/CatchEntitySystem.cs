@@ -7,18 +7,19 @@ public class CatchEntitySystem : ITickable
 { 
     bool _isEnabled = true;
 
-    GoalControllerMono _goal;
+    GoalControllerMono _goalControllerMono;
 
-    [Inject] public CatchEntitySystem()
+    [Inject] 
+    public CatchEntitySystem(GoalControllerMono goalControllerMono)
     {
-
+        _goalControllerMono = goalControllerMono;
     }
 
     public void Tick()
     {
         if (!_isEnabled) return;
 
-        if (Input.GetMouseButtonDown(0)) // ç∂ÉNÉäÉbÉN
+        if (Input.GetMouseButtonDown(0)) // Â∑¶„ÇØ„É™„ÉÉ„ÇØ
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
@@ -26,7 +27,7 @@ public class CatchEntitySystem : ITickable
             if (hit.collider != null)
             {
                 IEntity? entity = hit.collider.GetComponent<IEntity>();
-                entity?.Caught();
+                entity?.Caught(CalculateTargetPosition());
                 DisableSystem();
             }
         }
@@ -40,5 +41,22 @@ public class CatchEntitySystem : ITickable
     public void DisableSystem()
     {
         _isEnabled = false;
+    }
+
+    Vector2 CalculateTargetPosition()
+    {
+        Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(Camera.main, 
+            _goalControllerMono.GoalPosition());
+
+        if (RectTransformUtility.ScreenPointToWorldPointInRectangle(_goalControllerMono.GoalRect, screenPos, 
+                Camera.main, out var worldPos))
+        {
+            return worldPos;
+        }
+        else
+        {
+            Debug.LogError("‰Ωï„Åã„ÅåNull„Å´„Å™„Å£„Å¶„Çã");
+            return Vector2.zero;
+        }
     }
 }

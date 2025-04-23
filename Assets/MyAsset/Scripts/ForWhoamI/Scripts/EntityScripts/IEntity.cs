@@ -1,5 +1,6 @@
 ﻿
 using System;
+using UnityEngine;
 
 public interface IEntity
 {
@@ -7,7 +8,7 @@ public interface IEntity
     void EnableEntity();
     void DisEnableEntity();
     void Action();
-    void Caught();
+    void Caught(Vector2 target);
     void Move();
     void Destroy();
     void SuccessAnimation();
