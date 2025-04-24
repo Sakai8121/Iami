@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
-public class CircleEntityMono:MonoBehaviour,IEntity
+public class SquareEntityMono:MonoBehaviour,IEntity
 {
     [SerializeField] Rigidbody2D rb = null!;
     [SerializeField] SpriteRenderer entitySpriteRenderer = null!;
