@@ -184,7 +184,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7429647938130165454}
   - component: {fileID: 6598784490861483022}
-  - component: {fileID: 7731448644740865149}
+  - component: {fileID: 8249859797994879092}
   - component: {fileID: 1413196507618905957}
   - component: {fileID: 5616561034271892215}
   m_Layer: 0
@@ -266,7 +266,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &7731448644740865149
+--- !u!114 &8249859797994879092
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -275,12 +275,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 8499427744386171028}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ed6cdd7e0ca4c7db1da9e52f0b62e5b, type: 3}
+  m_Script: {fileID: 11500000, guid: 48ad71caac11ab0469433df1520feb70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 1413196507618905957}
   entitySpriteRenderer: {fileID: 6598784490861483022}
   burningMaterial: {fileID: 2100000, guid: c3daaa25cf1cd0c4bb0ef25e53d8aea4, type: 2}
+  rightEyeTrans: {fileID: 8378506381418996166}
+  leftEyeTrans: {fileID: 1694632255076029623}
 --- !u!50 &1413196507618905957
 Rigidbody2D:
   serializedVersion: 5
