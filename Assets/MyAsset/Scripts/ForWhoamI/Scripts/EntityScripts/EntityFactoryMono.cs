@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 
 using UnityEngine;
@@ -22,12 +24,15 @@ public class EntityFactoryMono : MonoBehaviour
 
     [SerializeField] Transform spawnParent = null!;
 
-    TruthCheckExecutor _truthCheckExecutor;
+    EntityActionExecutor _entityActionExecutor;
+    EntityInstanceHolderMono _entityInstanceHolderMono;
 
     [Inject]
-    public void Construct(TruthCheckExecutor truthCheckExecutor)
+    public void Construct(
+        EntityActionExecutor entityActionExecutor,EntityInstanceHolderMono entityInstanceHolderMono)
     {
-        _truthCheckExecutor = truthCheckExecutor;
+        _entityActionExecutor = entityActionExecutor;
+        _entityInstanceHolderMono = entityInstanceHolderMono;
     }
 
     public void GenerateEntities(EntityKind entityKind)
@@ -71,6 +76,8 @@ public class EntityFactoryMono : MonoBehaviour
                 break;
         }
 
+        List<IEntity> ientities = new ();
+        IEntity? truthEntity = null;
         int truthIndex = Random.Range(0, count);
         for (int i = 0; i < count; i++)
         {
@@ -80,8 +87,22 @@ public class EntityFactoryMono : MonoBehaviour
 
             var entityObj = Instantiate(prefab, GetAlignedPosition(i,count), Quaternion.identity, spawnParent);
             var entity = entityObj.GetComponent<IEntity>();
-            entity?.Init(moveSpeed, actionInterval, isTruth, _truthCheckExecutor.CheckTruth);
+
+            if (entity != null)
+            {
+                entity.Init(moveSpeed, actionInterval, isTruth);
+
+                if (isTruth)
+                {
+                    _entityActionExecutor.EntityAction += entity.Action;
+                    truthEntity = entity;
+                }
+
+                ientities.Add(entity);
+            }
         }
+
+        _entityInstanceHolderMono.SetList(ientities, truthEntity);
     }
 
     Vector2 GetAlignedPosition(int index, int count)

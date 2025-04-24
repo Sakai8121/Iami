@@ -4,23 +4,25 @@ using System;
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class CircleEntityMono:MonoBehaviour,IEntity
 {
     [SerializeField] Rigidbody2D rb = null!;
+    [SerializeField] SpriteRenderer entitySpriteRenderer = null!;
+    [SerializeField] Material burningMaterial = null!;
 
     bool _isEnable;
-    bool _isCaught;
     bool _isTruth;
 
     float _acceleration = 5;
     float _moveSpeed;
     float _actionInterval;
-    
-    Coroutine? _actionLoopCoroutine;
+    float _burningThreshold;
 
-    Action<bool,IEntity> checkTruthAction;
+
+    Coroutine? _actionLoopCoroutine;
 
     void FixedUpdate()
     {
@@ -29,15 +31,23 @@ public class CircleEntityMono:MonoBehaviour,IEntity
         
         Move();
     }
+
+    public bool IsTruth()
+    {
+        return _isTruth;
+    }
     
-    public void Init(float moveSpeed,float actionInterval,bool isTruth,Action<bool,IEntity> checkTruth)
+    public void Init(float moveSpeed,float actionInterval,bool isTruth)
     {
         _isTruth = isTruth;
-        checkTruthAction = checkTruth;
         _moveSpeed = moveSpeed;
         _actionInterval = actionInterval;
 
+        InVisible();
         EnableEntity();
+
+        if(isTruth)
+            entitySpriteRenderer.material = new Material(burningMaterial);
     }
 
     public void EnableEntity()
@@ -61,19 +71,14 @@ public class CircleEntityMono:MonoBehaviour,IEntity
     public void Caught(Vector2 targetPosition)
     {
         DisEnableEntity();
-        
-        rb.rotation = 0;
-        rb.angularVelocity = 0;
-        rb.linearVelocity = new Vector2(0, 0);
-        rb.freezeRotation = true;
-        rb.constraints = RigidbodyConstraints2D.FreezePositionX
-                        | RigidbodyConstraints2D.FreezePositionY;
+
+        rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
+        rb.rotation = 0f;
+        transform.rotation = Quaternion.identity;
+        rb.constraints = RigidbodyConstraints2D.FreezeAll;
         //中心に移動
         transform.DOMove(targetPosition,TimeInfoStatic.waitMovingToGoalTime);
-
-        //本物かどうかを判定
-        checkTruthAction(_isTruth,this);
-        _isCaught = true;
     }
 
     public void Move()
@@ -90,20 +95,35 @@ public class CircleEntityMono:MonoBehaviour,IEntity
 
     public void Destroy()
     {
-        Destroy(this.gameObject);
-        _isCaught = false;
+        
     }
 
     public void SuccessAnimation()
     {
         //目を開くアニメーション
-
+        Debug.Log("Clear");
     }
 
     public void FailAnimation()
     {
         //燃え尽きるアニメーション（新しくマテリアルを生成する）
+        Debug.Log("Miss");
 
+        // DOTweenで1秒間かけてthresholdを1.1まで上げる
+        DOTween.To(() => _burningThreshold, x => {
+            _burningThreshold = x;
+            entitySpriteRenderer.material.SetFloat("_Threshold", _burningThreshold);
+        }, 1.1f, TimeInfoStatic.burningTime);
+    }
+
+    public void Visible()
+    {
+        entitySpriteRenderer.enabled = true;
+    }
+
+    public void InVisible()
+    {
+        entitySpriteRenderer.enabled = false;
     }
     
     void StartActionLoop()

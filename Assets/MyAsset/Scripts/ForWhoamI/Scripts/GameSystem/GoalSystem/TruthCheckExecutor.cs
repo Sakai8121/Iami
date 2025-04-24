@@ -7,11 +7,8 @@ public class TruthCheckExecutor
 {
     float checkWaitingTime = 3;
 
-    [Inject]
-    public TruthCheckExecutor()
-    {
-
-    }
+    public event Action EndGameAction = () => { };
+    public event Action RestartGameAction = () => { };
 
     public void CheckTruth(bool isTruth,IEntity ientity)
     {
@@ -27,9 +24,10 @@ public class TruthCheckExecutor
 
     async UniTaskVoid TrueAnimation(IEntity ientity)
     {
-
+        
         await UniTask.Delay(TimeSpan.FromSeconds(checkWaitingTime));
         ientity.SuccessAnimation();
+        EndGameAction();
     }
 
     async UniTaskVoid FalseAnimation(IEntity ientity)
@@ -37,5 +35,6 @@ public class TruthCheckExecutor
         
         await UniTask.Delay(TimeSpan.FromSeconds(checkWaitingTime));
         ientity.FailAnimation();
+        RestartGameAction();
     }
 }

@@ -11,6 +11,14 @@ public class StageTitleExecutorMono: MonoBehaviour
 
     [SerializeField] float finalScale = 1f;
 
+    private void Awake()
+    {
+        var currentColor = stageTitleText.color;
+        currentColor.a = 0;
+        stageTitleText.color = currentColor;
+    }
+
+
     public void StageTitleAnimation(StageIndex stageIndex, float animationTime)
     {
         var stageTitle = ConvertStageTitle(stageIndex);
@@ -20,12 +28,10 @@ public class StageTitleExecutorMono: MonoBehaviour
         stageTitleRectTransform.localScale = Vector3.one;
         stageTitleText.alpha = 0;
 
-        float halfTime = animationTime / 2f;
-
         Sequence sequence = DOTween.Sequence();
 
-        // フェードイン（中央拡大）
-        sequence.Append(stageTitleText.DOFade(1f, halfTime));
+        // フェードイン
+        sequence.Append(stageTitleText.DOFade(1f, animationTime));
     }
 
 

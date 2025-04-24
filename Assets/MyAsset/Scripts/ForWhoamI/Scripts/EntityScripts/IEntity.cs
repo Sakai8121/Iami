@@ -4,7 +4,8 @@ using UnityEngine;
 
 public interface IEntity
 {
-    void Init(float moveSpeed,float actionInterval,bool isTruth,Action<bool,IEntity> checkTruth);
+    bool IsTruth();
+    void Init(float moveSpeed,float actionInterval,bool isTruth);
     void EnableEntity();
     void DisEnableEntity();
     void Action();
@@ -13,4 +14,6 @@ public interface IEntity
     void Destroy();
     void SuccessAnimation();
     void FailAnimation();
+    void Visible();
+    void InVisible();
 }

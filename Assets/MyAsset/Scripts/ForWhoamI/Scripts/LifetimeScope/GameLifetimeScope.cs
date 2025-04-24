@@ -10,18 +10,24 @@ public class GameLifetimeScope : LifetimeScope
         builder.Register<StageHolder>(Lifetime.Scoped);
         builder.Register<TruthCheckExecutor>(Lifetime.Scoped);
         builder.Register<SceneLoader>(Lifetime.Scoped);
+        builder.Register<GameStateObserver>(Lifetime.Scoped);
 
         //InitializedやITickableを使いたいとき、他のクラスから参照されるだけのとき（AsSelfをつける）
         //他のクラスを参照したいときはRegister
         builder.RegisterEntryPoint<TimeHolder>().AsSelf();
         builder.RegisterEntryPoint<CatchEntitySystem>().AsSelf();
-        builder.RegisterEntryPoint<GameStateManager>();
+        builder.RegisterEntryPoint<GameInitializer>();
+        builder.RegisterEntryPoint<EntityActionExecutor>().AsSelf();
 
         // MonoBehaviourの登録
         builder.RegisterComponentInHierarchy<TimerTextViewMono>();
         builder.RegisterComponentInHierarchy<EntityFactoryMono>();
         builder.RegisterComponentInHierarchy<StageTitleExecutorMono>();
         builder.RegisterComponentInHierarchy<GoalControllerMono>();
+        builder.RegisterComponentInHierarchy<SpaceUIMono>();
+        builder.RegisterComponentInHierarchy<EntitySpriteHolderMono>();
+        builder.RegisterComponentInHierarchy<StartExplainUIMono>();
+        builder.RegisterComponentInHierarchy<EntityInstanceHolderMono>();
     }
 
 }

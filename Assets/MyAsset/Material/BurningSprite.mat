@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Burning
-  m_Shader: {fileID: 4800000, guid: 19326d3913698ce4689606c89006375a, type: 3}
+  m_Name: BurningSprite
+  m_Shader: {fileID: 4800000, guid: 1b8a98a1e5c3e304e96c1381978b03b2, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -45,13 +45,13 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _EdgeWidth: 0.08
+    - _EdgeWidth: 0.001
     - _EnableExternalAlpha: 0
     - _Threshold: 0
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EdgeColor: {r: 1, g: 0.4406382, b: 0, a: 1}
+    - _EdgeColor: {r: 1, g: 0.5, b: 0, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using UnityEngine;
+using VContainer;
 using VContainer.Unity;
 
 public class TimeHolder: ITickable
@@ -9,6 +10,12 @@ public class TimeHolder: ITickable
     
     float _timeElapsed = 0f;
     bool _isRunning = false;
+
+    [Inject]
+    public TimeHolder(TruthCheckExecutor executor)
+    {
+        executor.EndGameAction += StopTimer;
+    }
 
     public void StartTimer()
     {

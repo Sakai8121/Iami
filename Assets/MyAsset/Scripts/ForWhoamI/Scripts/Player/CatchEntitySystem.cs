@@ -1,18 +1,29 @@
 #nullable enable
+using Unity.VisualScripting;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class CatchEntitySystem : ITickable
 { 
     bool _isEnabled = true;
 
     GoalControllerMono _goalControllerMono;
+    TruthCheckExecutor _truthCheckExecutor;
+    EntityActionExecutor _entityActionExecutor;
 
     [Inject] 
-    public CatchEntitySystem(GoalControllerMono goalControllerMono)
+    public CatchEntitySystem(GoalControllerMono goalControllerMono,EntityActionExecutor entityActionExecutor,
+        TruthCheckExecutor truthCheckExecutor)
     {
         _goalControllerMono = goalControllerMono;
+        _entityActionExecutor = entityActionExecutor;
+        _truthCheckExecutor = truthCheckExecutor;
+
+        DisableSystem();
+
+        truthCheckExecutor.RestartGameAction += EnableSystem;
     }
 
     public void Tick()
@@ -27,8 +38,14 @@ public class CatchEntitySystem : ITickable
             if (hit.collider != null)
             {
                 IEntity? entity = hit.collider.GetComponent<IEntity>();
-                entity?.Caught(CalculateTargetPosition());
-                DisableSystem();
+                if (entity != null)
+                {
+                    entity.Caught(CalculateTargetPosition());
+                    _truthCheckExecutor.CheckTruth(entity.IsTruth(), entity);
+
+                    DisableSystem();
+                    _entityActionExecutor.LockActivate();
+                }
             }
         }
     }
@@ -45,10 +62,10 @@ public class CatchEntitySystem : ITickable
 
     Vector2 CalculateTargetPosition()
     {
-        Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(Camera.main, 
+        Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(Camera.main,
             _goalControllerMono.GoalPosition());
 
-        if (RectTransformUtility.ScreenPointToWorldPointInRectangle(_goalControllerMono.GoalRect, screenPos, 
+        if (RectTransformUtility.ScreenPointToWorldPointInRectangle(_goalControllerMono.GoalRect, screenPos,
                 Camera.main, out var worldPos))
         {
             return worldPos;
