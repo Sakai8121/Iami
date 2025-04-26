@@ -8,5 +8,6 @@ public class RootLifetimeScope : LifetimeScope
     {
         base.Configure(builder);
         builder.Register<StageIndexHolder>(Lifetime.Singleton);
+        builder.Register<ScoreHolder>(Lifetime.Singleton);
     }
 }

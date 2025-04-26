@@ -48,13 +48,13 @@ public class EntityFactoryMono : MonoBehaviour
                 prefab = circlePrefab;
                 count = circleCount;
                 moveSpeed = 4f;
-                actionInterval = 1;
+                actionInterval = 2;
                 break;
             case EntityKind.Star:
                 prefab = starPrefab;
                 count = starCount;
                 moveSpeed = 4f;
-                actionInterval = 1;
+                actionInterval = 2;
                 break;
             case EntityKind.Gear:
                 prefab = gearPrefab;
@@ -66,7 +66,7 @@ public class EntityFactoryMono : MonoBehaviour
                 prefab = heartPrefab;
                 count = heartCount;
                 moveSpeed = 0f; // 通常は動かないが、アクション時に加速
-                actionInterval = 1;
+                actionInterval = 2;
                 break;
             case EntityKind.Square:
                 prefab = squarePrefab;

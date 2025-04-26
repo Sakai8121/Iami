@@ -18,7 +18,7 @@ public class StarEntityMono:MonoBehaviour,IEntity
     bool _isEnable;
     bool _isTruth;
 
-    float _acceleration = 50;
+    float _acceleration = 80;
     float _moveSpeed;
     float _actionInterval;
     float _burningThreshold;
@@ -56,6 +56,8 @@ public class StarEntityMono:MonoBehaviour,IEntity
 
         if (isTruth)
             entitySpriteRenderer.material = new Material(burningMaterial);
+
+        Action();
     }
 
     public void EnableEntity()
@@ -72,8 +74,14 @@ public class StarEntityMono:MonoBehaviour,IEntity
 
     public void Action()
     {
-        float randomAngle = Random.Range(0, 360f);
-        _actionTween = transform.DORotate(new Vector3(0, 0, randomAngle), 0.5f, RotateMode.FastBeyond360);
+        float randomAngle = Random.Range(90, 360f);
+        _actionTween = transform.DORotate(new Vector3(0, 0, randomAngle), 0.1f, RotateMode.FastBeyond360)
+            .OnComplete(() =>
+            {
+                Vector2 direction = transform.up;
+
+                rb.AddForce(direction * _acceleration, ForceMode2D.Force); 
+            });
     }
 
     public void Caught(Vector2 targetPosition)
@@ -93,10 +101,7 @@ public class StarEntityMono:MonoBehaviour,IEntity
 
     public void Move()
     {
-        Vector2 direction = transform.up;
         Vector2 currentVelocity = rb.linearVelocity;
-
-        rb.AddForce(direction * _acceleration, ForceMode2D.Force);
         
         // 最大速度を制限
         if (currentVelocity.sqrMagnitude > _moveSpeed)
@@ -150,6 +155,11 @@ public class StarEntityMono:MonoBehaviour,IEntity
 
         blinkSequence.Append(rightEyeTrans.DOScale(Vector2.zero, 0.2f).SetEase(Ease.InQuad));
         blinkSequence.Join(leftEyeTrans.DOScale(Vector2.zero, 0.2f).SetEase(Ease.InQuad));
+        
+        blinkSequence.AppendInterval(0.1f);
+
+        blinkSequence.Append(rightEyeTrans.DOScale(openSize, 0.2f).SetEase(Ease.OutQuad));
+        blinkSequence.Join(leftEyeTrans.DOScale(openSize, 0.2f).SetEase(Ease.OutQuad));
 
         // ループさせたい場合（任意）
         blinkSequence.SetLoops(3, LoopType.Restart);

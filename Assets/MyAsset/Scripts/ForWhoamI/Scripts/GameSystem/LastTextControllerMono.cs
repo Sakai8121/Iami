@@ -34,7 +34,7 @@ public class LastTextControllerMono: MonoBehaviour
         foreach (char c in _thankYouTextValue)
         {
             thankYouText.text += c;
-            yield return new WaitForSeconds(0.05f); // 文字ごとの表示間隔
+            yield return new WaitForSeconds(0.1f); // 文字ごとの表示間隔
         }
 
         WaitClickTask().Forget();

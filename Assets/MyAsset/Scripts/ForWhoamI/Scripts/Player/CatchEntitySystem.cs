@@ -67,14 +67,12 @@ public class CatchEntitySystem : ITickable
     {
         _isEnabled = true;
         ActiveClickUIAction();
-        Debug.LogError("Ena");
     }
 
     void DisableSystem()
     {
         _isEnabled = false;
         DeactivateClickUIAction();
-        Debug.LogError("DisE");
     }
     
     void ReActiveTask()

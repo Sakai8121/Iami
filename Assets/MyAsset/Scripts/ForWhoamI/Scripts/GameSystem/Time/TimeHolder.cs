@@ -12,14 +12,20 @@ public class TimeHolder: ITickable
     bool _isRunning = false;
 
     [Inject]
-    public TimeHolder(TruthCheckExecutor executor)
+    public TimeHolder()
     {
-        executor.EndGameAction += StopTimer;
+        
     }
 
     public void StartTimer()
     {
         _isRunning = true;
+    }
+
+    public float EndGameTimer()
+    {
+        _isRunning = false;
+        return _timeElapsed;
     }
 
     public void StopTimer()

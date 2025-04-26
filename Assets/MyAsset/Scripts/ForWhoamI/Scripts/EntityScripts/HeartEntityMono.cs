@@ -18,7 +18,7 @@ public class HeartEntityMono:MonoBehaviour,IEntity
     bool _isEnable;
     bool _isTruth;
 
-    float _acceleration = 5;
+    float _acceleration = 10;
     float _moveSpeed;
     float _actionInterval;
     float _burningThreshold;
@@ -155,6 +155,11 @@ public class HeartEntityMono:MonoBehaviour,IEntity
 
         blinkSequence.Append(rightEyeTrans.DOScale(Vector2.zero, 0.2f).SetEase(Ease.InQuad));
         blinkSequence.Join(leftEyeTrans.DOScale(Vector2.zero, 0.2f).SetEase(Ease.InQuad));
+        
+        blinkSequence.AppendInterval(0.1f);
+
+        blinkSequence.Append(rightEyeTrans.DOScale(openSize, 0.2f).SetEase(Ease.OutQuad));
+        blinkSequence.Join(leftEyeTrans.DOScale(openSize, 0.2f).SetEase(Ease.OutQuad));
 
         // ループさせたい場合（任意）
         blinkSequence.SetLoops(3, LoopType.Restart);

@@ -8,7 +8,7 @@ public class CameraControllerMono : MonoBehaviour
     float _stage2OrthoSize = 2f;
     float _stage3OrthoSize = 3f;
 
-    float _stageHeight = 4;
+    float _stageHeight = 3.5f;
 
     float _zoomedFOV = 30f;         // ズーム時のFOV
     float _stageDurationRatio = 0.1f;
