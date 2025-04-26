@@ -23,6 +23,8 @@ public class GearEntityMono:MonoBehaviour,IEntity
     float _actionInterval;
     float _burningThreshold;
 
+    float _angulerVelocity = 2;
+
     Vector2 openSize = new Vector2(0.3f, 0.5f);
 
 
@@ -71,8 +73,7 @@ public class GearEntityMono:MonoBehaviour,IEntity
 
     public void Action()
     {
-        float randomAngle = Random.Range(0, 360f);
-        transform.DORotate(new Vector3(0, 0, randomAngle), 0.5f, RotateMode.FastBeyond360);
+        _angulerVelocity *= -1;
     }
 
     public void Caught(Vector2 targetPosition)
@@ -98,6 +99,8 @@ public class GearEntityMono:MonoBehaviour,IEntity
         {
             rb.AddForce(direction * _acceleration, ForceMode2D.Force);
         }
+
+        rb.angularVelocity = _angulerVelocity;
     }
 
     public void Destroy()
@@ -145,6 +148,11 @@ public class GearEntityMono:MonoBehaviour,IEntity
 
         blinkSequence.Append(rightEyeTrans.DOScale(Vector2.zero, 0.2f).SetEase(Ease.InQuad));
         blinkSequence.Join(leftEyeTrans.DOScale(Vector2.zero, 0.2f).SetEase(Ease.InQuad));
+        
+        blinkSequence.AppendInterval(0.1f);
+
+        blinkSequence.Append(rightEyeTrans.DOScale(openSize, 0.2f).SetEase(Ease.OutQuad));
+        blinkSequence.Join(leftEyeTrans.DOScale(openSize, 0.2f).SetEase(Ease.OutQuad));
 
         // ループさせたい場合（任意）
         blinkSequence.SetLoops(3, LoopType.Restart);

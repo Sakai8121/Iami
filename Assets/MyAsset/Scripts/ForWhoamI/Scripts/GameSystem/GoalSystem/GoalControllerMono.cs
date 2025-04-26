@@ -3,9 +3,9 @@ using UnityEngine.UI;
 
 public class GoalControllerMono : MonoBehaviour
 {
-    [SerializeField] RectTransform goalTransform = null!;
-    [SerializeField] Image goalMaskImage = null!;
-    public RectTransform GoalRect => goalTransform;
+    [SerializeField] Transform goalTransform = null!;
+    [SerializeField] SpriteRenderer goalMaskImage = null!;
+    public Transform GoalRect => goalTransform;
     public Vector2 GoalPosition()
     {
         return goalTransform.position;

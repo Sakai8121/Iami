@@ -23,6 +23,8 @@ public class HeartEntityMono:MonoBehaviour,IEntity
     float _actionInterval;
     float _burningThreshold;
 
+    float _accelerationSpeed = 2;
+
     Vector2 openSize = new Vector2(0.3f, 0.5f);
 
 
@@ -71,9 +73,17 @@ public class HeartEntityMono:MonoBehaviour,IEntity
 
     public void Action()
     {
-        float randomAngle = Random.Range(0, 360f);
-        transform.DORotate(new Vector3(0, 0, randomAngle), 0.5f, RotateMode.FastBeyond360);
+        // ランダムな角度（0〜360度）を取得
+        float randomAngle = Random.Range(0f, 360f);
+
+        // Z軸周りに回転を適用
+        transform.rotation = Quaternion.Euler(0f, 0f, randomAngle);
+
+        // 上方向（ローカルY）に力を加える
+        Vector2 direction = transform.up;
+        rb.AddForce(direction * _accelerationSpeed, ForceMode2D.Impulse);
     }
+
 
     public void Caught(Vector2 targetPosition)
     {

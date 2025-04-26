@@ -7,7 +7,7 @@ using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class CatchEntitySystem : ITickable
 { 
-    bool _isEnabled = true;
+    bool _isEnabled = false;
 
     GoalControllerMono _goalControllerMono;
     TruthCheckExecutor _truthCheckExecutor;
@@ -40,7 +40,7 @@ public class CatchEntitySystem : ITickable
                 IEntity? entity = hit.collider.GetComponent<IEntity>();
                 if (entity != null)
                 {
-                    entity.Caught(CalculateTargetPosition());
+                    entity.Caught(_goalControllerMono.GoalPosition());
                     _truthCheckExecutor.CheckTruth(entity.IsTruth(), entity);
 
                     DisableSystem();
@@ -58,22 +58,5 @@ public class CatchEntitySystem : ITickable
     public void DisableSystem()
     {
         _isEnabled = false;
-    }
-
-    Vector2 CalculateTargetPosition()
-    {
-        Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(Camera.main,
-            _goalControllerMono.GoalPosition());
-
-        if (RectTransformUtility.ScreenPointToWorldPointInRectangle(_goalControllerMono.GoalRect, screenPos,
-                Camera.main, out var worldPos))
-        {
-            return worldPos;
-        }
-        else
-        {
-            Debug.LogError("何かがNullになってる");
-            return Vector2.zero;
-        }
     }
 }

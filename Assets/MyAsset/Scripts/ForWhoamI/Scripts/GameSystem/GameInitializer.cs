@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using System.Collections;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
@@ -84,6 +85,13 @@ public class GameInitializer:IInitializable
     void StartGame()
     {
         _timeHolder.StartTimer();
+
+        EnableTask().Forget();
+    }
+
+    async UniTaskVoid EnableTask()
+    {
+        await UniTask.Delay(TimeSpan.FromSeconds(0.1f));
         _entityCatchSystem.EnableSystem();
     }
 

@@ -10,15 +10,25 @@ public class TruthCheckExecutor
     public event Action EndGameAction = () => { };
     public event Action RestartGameAction = () => { };
 
+    CameraControllerMono _cameraControllerMono;
+    
+    [Inject]
+    public TruthCheckExecutor(CameraControllerMono cameraControllerMono)
+    {
+        _cameraControllerMono = cameraControllerMono;
+    }
+
     public void CheckTruth(bool isTruth,IEntity ientity)
     {
         if (isTruth)
         {
             TrueAnimation(ientity).Forget();
+            _cameraControllerMono.SuccessCameraAnimation(checkWaitingTime);
         }
         else
         {
             FalseAnimation(ientity).Forget();
+            _cameraControllerMono.FailCameraAnimation(checkWaitingTime);
         }
     }
 

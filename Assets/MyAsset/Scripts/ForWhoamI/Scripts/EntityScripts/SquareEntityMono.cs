@@ -22,6 +22,9 @@ public class SquareEntityMono:MonoBehaviour,IEntity
     float _moveSpeed;
     float _actionInterval;
     float _burningThreshold;
+    
+    Tween? _scaleTween;
+    Vector3 _firstScale;
 
     Vector2 openSize = new Vector2(0.3f, 0.5f);
 
@@ -53,6 +56,8 @@ public class SquareEntityMono:MonoBehaviour,IEntity
         rightEyeTrans.localScale = Vector3.zero;
         leftEyeTrans.localScale = Vector3.zero;
 
+        _firstScale = transform.localScale;
+        
         if (isTruth)
             entitySpriteRenderer.material = new Material(burningMaterial);
     }
@@ -71,8 +76,21 @@ public class SquareEntityMono:MonoBehaviour,IEntity
 
     public void Action()
     {
-        float randomAngle = Random.Range(0, 360f);
-        transform.DORotate(new Vector3(0, 0, randomAngle), 0.5f, RotateMode.FastBeyond360);
+        // すでにアニメーション中なら止めてリセット
+        if (_scaleTween != null && _scaleTween.IsActive())
+        {
+            _scaleTween.Kill();
+            transform.localScale = _firstScale; // 念のためリセット
+        }
+
+        // アニメーション作成：1.3倍に拡大してから元に戻る
+        _scaleTween = transform.DOScale(_firstScale*1.3f, 0.3f)
+            .SetEase(Ease.OutQuad)
+            .OnComplete(() =>
+            {
+                _scaleTween = transform.DOScale(_firstScale, 0.15f)
+                    .SetEase(Ease.InQuad);
+            });
     }
 
     public void Caught(Vector2 targetPosition)
@@ -145,6 +163,11 @@ public class SquareEntityMono:MonoBehaviour,IEntity
 
         blinkSequence.Append(rightEyeTrans.DOScale(Vector2.zero, 0.2f).SetEase(Ease.InQuad));
         blinkSequence.Join(leftEyeTrans.DOScale(Vector2.zero, 0.2f).SetEase(Ease.InQuad));
+        
+        blinkSequence.AppendInterval(0.1f);
+
+        blinkSequence.Append(rightEyeTrans.DOScale(openSize, 0.2f).SetEase(Ease.OutQuad));
+        blinkSequence.Join(leftEyeTrans.DOScale(openSize, 0.2f).SetEase(Ease.OutQuad));
 
         // ループさせたい場合（任意）
         blinkSequence.SetLoops(3, LoopType.Restart);
