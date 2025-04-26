@@ -16,9 +16,9 @@ public class EntityFactoryMono : MonoBehaviour
     [SerializeField] GameObject heartPrefab = null!;
     [SerializeField] GameObject squarePrefab = null!;
 
-    int circleCount = 24;
-    int starCount = 24;
-    int gearCount = 18;
+    int circleCount = 18;
+    int starCount = 18;
+    int gearCount = 12;
     int heartCount = 12;
     int squareCount = 6;
 

@@ -25,6 +25,7 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<StageTitleExecutorMono>();
         builder.RegisterComponentInHierarchy<GoalControllerMono>();
         builder.RegisterComponentInHierarchy<SpaceUIMono>();
+        builder.RegisterComponentInHierarchy<ClickUIMono>();
         builder.RegisterComponentInHierarchy<EntitySpriteHolderMono>();
         builder.RegisterComponentInHierarchy<StartExplainUIMono>();
         builder.RegisterComponentInHierarchy<EntityInstanceHolderMono>();

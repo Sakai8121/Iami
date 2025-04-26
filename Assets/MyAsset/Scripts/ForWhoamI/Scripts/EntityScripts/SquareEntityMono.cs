@@ -96,11 +96,14 @@ public class SquareEntityMono:MonoBehaviour,IEntity
     public void Caught(Vector2 targetPosition)
     {
         DisEnableEntity();
+        if(_scaleTween != null)
+            _scaleTween.Kill();
 
         rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
         rb.rotation = 0f;
         transform.rotation = Quaternion.identity;
+        transform.localScale = _firstScale;
         rb.constraints = RigidbodyConstraints2D.FreezeAll;
         //中心に移動
         transform.DOMove(targetPosition,TimeInfoStatic.waitMovingToGoalTime);

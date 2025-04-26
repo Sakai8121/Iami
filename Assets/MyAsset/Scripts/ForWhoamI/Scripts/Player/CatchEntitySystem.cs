@@ -1,17 +1,25 @@
 #nullable enable
-using Unity.VisualScripting;
+using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class CatchEntitySystem : ITickable
 { 
     bool _isEnabled = false;
+    const float reActiveTime = 6f;
+    float _elapsed = 0f;
 
     GoalControllerMono _goalControllerMono;
     TruthCheckExecutor _truthCheckExecutor;
     EntityActionExecutor _entityActionExecutor;
+    CancellationTokenSource _cts;
+    
+    public event Action DeactivateClickUIAction = () => { };
+    public event Action ActiveClickUIAction = () => { };
+    public event Action<float> ChangeUIFillAmount = (_) => { }; 
 
     [Inject] 
     public CatchEntitySystem(GoalControllerMono goalControllerMono,EntityActionExecutor entityActionExecutor,
@@ -20,14 +28,15 @@ public class CatchEntitySystem : ITickable
         _goalControllerMono = goalControllerMono;
         _entityActionExecutor = entityActionExecutor;
         _truthCheckExecutor = truthCheckExecutor;
+        _elapsed = reActiveTime;
 
         DisableSystem();
-
-        truthCheckExecutor.RestartGameAction += EnableSystem;
     }
 
     public void Tick()
     {
+        ChangeUIFillAmount(_elapsed/reActiveTime);
+        
         if (!_isEnabled) return;
 
         if (Input.GetMouseButtonDown(0)) // 左クリック
@@ -47,6 +56,8 @@ public class CatchEntitySystem : ITickable
 
                     DisableSystem();
                     _entityActionExecutor.LockActivate();
+                    _elapsed = 0;
+                    ReActiveTask();
                 }
             }
         }
@@ -55,10 +66,46 @@ public class CatchEntitySystem : ITickable
     public void EnableSystem()
     {
         _isEnabled = true;
+        ActiveClickUIAction();
+        Debug.LogError("Ena");
     }
 
-    public void DisableSystem()
+    void DisableSystem()
     {
         _isEnabled = false;
+        DeactivateClickUIAction();
+        Debug.LogError("DisE");
+    }
+    
+    void ReActiveTask()
+    {
+        // 既存のタスクをキャンセルしてから新しいトークンを作る
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+
+        ReActiveSpaceUI(_cts.Token).Forget();
+    }
+    
+    async UniTaskVoid ReActiveSpaceUI(CancellationToken token)
+    {
+        try
+        {
+            while (_elapsed < reActiveTime)
+            {
+                // キャンセルチェック（token.ThrowIfCancellationRequested(); でも可）
+                if (token.IsCancellationRequested) return;
+
+                await UniTask.Yield(PlayerLoopTiming.Update, token);
+
+                _elapsed += Time.deltaTime;
+            }
+
+            EnableSystem();
+        }
+        catch (OperationCanceledException)
+        {
+            // キャンセル時は何もしない
+        }
     }
 }

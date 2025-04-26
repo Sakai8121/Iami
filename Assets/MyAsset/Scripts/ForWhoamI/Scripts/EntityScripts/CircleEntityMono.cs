@@ -18,7 +18,7 @@ public class CircleEntityMono:MonoBehaviour,IEntity
     bool _isEnable;
     bool _isTruth;
 
-    float _acceleration = 5;
+    float _acceleration = 50;
     float _moveSpeed;
     float _actionInterval;
     float _burningThreshold;
@@ -27,6 +27,7 @@ public class CircleEntityMono:MonoBehaviour,IEntity
 
 
     Coroutine? _actionLoopCoroutine;
+    Tween? _actionTween;
 
     void FixedUpdate()
     {
@@ -72,12 +73,14 @@ public class CircleEntityMono:MonoBehaviour,IEntity
     public void Action()
     {
         float randomAngle = Random.Range(0, 360f);
-        transform.DORotate(new Vector3(0, 0, randomAngle), 0.5f, RotateMode.FastBeyond360);
+        _actionTween = transform.DORotate(new Vector3(0, 0, randomAngle), 0.5f, RotateMode.FastBeyond360);
     }
 
     public void Caught(Vector2 targetPosition)
     {
         DisEnableEntity();
+        if(_actionTween != null)
+            _actionTween.Kill();
 
         rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
@@ -93,10 +96,12 @@ public class CircleEntityMono:MonoBehaviour,IEntity
         Vector2 direction = transform.up;
         Vector2 currentVelocity = rb.linearVelocity;
 
-        // 最大速度を超えていないときのみ加速
-        if (currentVelocity.sqrMagnitude < _moveSpeed)
+        rb.AddForce(direction * _acceleration, ForceMode2D.Force);
+        
+        // 最大速度を制限
+        if (currentVelocity.sqrMagnitude > _moveSpeed)
         {
-            rb.AddForce(direction * _acceleration, ForceMode2D.Force);
+            rb.linearVelocity = currentVelocity.normalized * _moveSpeed;
         }
     }
 

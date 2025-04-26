@@ -23,7 +23,7 @@ public class GearEntityMono:MonoBehaviour,IEntity
     float _actionInterval;
     float _burningThreshold;
 
-    float _angulerVelocity = 2;
+    float _angularVelocity = 1000;
 
     Vector2 openSize = new Vector2(0.3f, 0.5f);
 
@@ -73,7 +73,7 @@ public class GearEntityMono:MonoBehaviour,IEntity
 
     public void Action()
     {
-        _angulerVelocity *= -1;
+        _angularVelocity *= -1;
     }
 
     public void Caught(Vector2 targetPosition)
@@ -100,7 +100,7 @@ public class GearEntityMono:MonoBehaviour,IEntity
             rb.AddForce(direction * _acceleration, ForceMode2D.Force);
         }
 
-        rb.angularVelocity = _angulerVelocity;
+        rb.angularVelocity = _angularVelocity;
     }
 
     public void Destroy()

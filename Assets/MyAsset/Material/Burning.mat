@@ -47,7 +47,7 @@ Material:
     m_Floats:
     - _EdgeWidth: 0.08
     - _EnableExternalAlpha: 0
-    - _Threshold: 1.1
+    - _Threshold: 0
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

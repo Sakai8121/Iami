@@ -23,7 +23,7 @@ public class HeartEntityMono:MonoBehaviour,IEntity
     float _actionInterval;
     float _burningThreshold;
 
-    float _accelerationSpeed = 2;
+    float _accelerationSpeed = 5;
 
     Vector2 openSize = new Vector2(0.3f, 0.5f);
 
