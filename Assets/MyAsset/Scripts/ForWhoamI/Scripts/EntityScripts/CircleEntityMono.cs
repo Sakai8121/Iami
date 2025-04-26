@@ -79,7 +79,7 @@ public class CircleEntityMono:MonoBehaviour,IEntity
         {
             Vector2 direction = transform.up;
 
-            rb.AddForce(direction * _acceleration, ForceMode2D.Force); 
+            rb.AddForce(direction * _acceleration, ForceMode2D.Impulse); 
         });
     }
 
