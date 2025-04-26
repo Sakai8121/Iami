@@ -7,7 +7,7 @@ public class StartExplainUIMono : MonoBehaviour
     [SerializeField] GameObject startUIObject = null!;
     [SerializeField] TextMeshProUGUI textMesh = null!;
 
-    string clickText = "「スペース」をヒントに\r\n「クリック」で私を見つけて…";
+    string clickText = "[Space]キーをヒントに\r\n[クリック]で私を見つけて…";
     Coroutine? typingCoroutine = null;
 
     public void ActiveStartUI()

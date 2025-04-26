@@ -124,9 +124,11 @@ public class SESoundData
     public enum SE
     {
         Action,
-        Miss,
+        Button,
+        Check,
         Clear,
-        Check
+        Eye,
+        Miss
     }
 
     public SE se;

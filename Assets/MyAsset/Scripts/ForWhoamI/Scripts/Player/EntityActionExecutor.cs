@@ -42,6 +42,7 @@ public class EntityActionExecutor : ITickable, IDisposable
 
         if(Input.GetKeyDown(KeyCode.Space))
         {
+            SoundManagerMono.Instance.PlaySEOneShot(SESoundData.SE.Action);
             ExecuteEntityAction();
         }
     }

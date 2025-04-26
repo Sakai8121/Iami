@@ -29,6 +29,7 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<StartExplainUIMono>();
         builder.RegisterComponentInHierarchy<EntityInstanceHolderMono>();
         builder.RegisterComponentInHierarchy<CameraControllerMono>();
+        builder.RegisterComponentInHierarchy<LastTextControllerMono>();
     }
 
 }

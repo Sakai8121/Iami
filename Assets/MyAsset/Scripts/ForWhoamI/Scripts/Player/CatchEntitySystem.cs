@@ -40,6 +40,8 @@ public class CatchEntitySystem : ITickable
                 IEntity? entity = hit.collider.GetComponent<IEntity>();
                 if (entity != null)
                 {
+                    SoundManagerMono.Instance.PlaySEOneShot(SESoundData.SE.Check);
+                    
                     entity.Caught(_goalControllerMono.GoalPosition());
                     _truthCheckExecutor.CheckTruth(entity.IsTruth(), entity);
 

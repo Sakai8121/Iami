@@ -7,7 +7,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class GameInitializer:IInitializable
+public class GameInitializer:IInitializable,IStartable
 {
     TimeHolder _timeHolder;
     EntityFactoryMono _entityFactoryMono;
@@ -97,6 +97,10 @@ public class GameInitializer:IInitializable
 
     //エントリーポイント用
     public void Initialize(){}
+    public void Start()
+    {
+        SoundManagerMono.Instance.PlayBGM(BGMSoundData.BGM.GameBgm);
+    }
 }
 
 public enum GameState

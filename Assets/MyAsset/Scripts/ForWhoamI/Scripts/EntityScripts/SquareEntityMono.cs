@@ -84,11 +84,11 @@ public class SquareEntityMono:MonoBehaviour,IEntity
         }
 
         // アニメーション作成：1.3倍に拡大してから元に戻る
-        _scaleTween = transform.DOScale(_firstScale*1.3f, 0.3f)
+        _scaleTween = transform.DOScale(_firstScale*1.3f, 0.6f)
             .SetEase(Ease.OutQuad)
             .OnComplete(() =>
             {
-                _scaleTween = transform.DOScale(_firstScale, 0.15f)
+                _scaleTween = transform.DOScale(_firstScale, 0.4f)
                     .SetEase(Ease.InQuad);
             });
     }

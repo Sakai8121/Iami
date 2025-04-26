@@ -44,8 +44,14 @@ public class StageSelectMono: MonoBehaviour
         });
     }
 
+    void Start()
+    {
+        SoundManagerMono.Instance.PlayBGM(BGMSoundData.BGM.GameBgm);
+    }
+
     void LoadGameScene()
     {
+        SoundManagerMono.Instance.PlaySEOneShot(SESoundData.SE.Button);
         SceneManager.LoadScene("GameScene");
     }
 }
